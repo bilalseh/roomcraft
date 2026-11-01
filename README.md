@@ -3,7 +3,7 @@
 An AI-assisted 3D room planner. Describe a room, furnish it in 3D, ask an AI assistant for layout
 ideas that it applies directly in the scene, track the budget, and share the plan.
 
-**Live app:** https://roomcraft-planner.web.app · **API:** https://roomcraft-api.onrender.com/docs
+**Live app:** https://roomcraft-planner.web.app · **API:** https://roomcraft-api-929h.onrender.com/docs
 
 > Work in progress. The [product spec](docs/spec.md) describes the full feature set and the build
 > order.

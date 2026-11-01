@@ -5,16 +5,15 @@ like a real product, and the code must read like senior work (clean
 architecture, strict types, tests, docs).
 
 Product spec, architecture rules and build order: [docs/spec.md](docs/spec.md).
-Stop after each phase so the user can review.
+On 2026-11-01 the user asked to continue through all phases without stopping
+for review: commit and push each phase once `pnpm check` passes, and stop only
+when a phase needs a manual step from the user.
 
 ## Status
 
-Current phase: **1, finishing the API host switch.** `f9b5cb3` is pushed:
-CI checks green, web live on Firebase Hosting with the intended cache headers.
-Its API deploy failed because Hugging Face now charges for Docker Spaces
-(HTTP 402), so the user chose Render (ADR-0003). The Render migration is
-ready locally, not yet committed. Next: push, user creates the Render
-Blueprint, set `VITE_API_URL` to the Render URL, redeploy web, verify.
+Phase 1: done (verified 2026-11-01: CI green, web on Firebase Hosting, API on
+Render, live footer shows "API online").
+Current phase: **2, in progress** (room setup wizard + procedural room in 3D).
 
 ### Phase 1 plan (agreed)
 
@@ -55,9 +54,10 @@ and the shell footer shows the API `/health` status.
   Hosting URL: https://roomcraft-planner.web.app
 - Firestore: default database in `nam5`.
 - Backend: Render free web service (Docker), service `roomcraft-api` in
-  `ohio`, defined in `render.yaml`; expected URL
-  https://roomcraft-api.onrender.com (confirm once created). Sleeps after
-  15 minutes idle. Hugging Face Spaces was dropped: Docker Spaces need PRO.
+  `ohio`, defined in `render.yaml`. URL https://roomcraft-api-929h.onrender.com
+  (dashboard: https://dashboard.render.com/web/srv-dbjambu7bikc73et8o10).
+  Sleeps after 15 minutes idle. Hugging Face Spaces was dropped: Docker Spaces
+  need PRO.
 - Build-time web config comes from GitHub Actions variables (`VITE_*`), not
   secrets: it is public, and committing the Firebase API key would trip
   GitHub secret scanning.
@@ -87,7 +87,7 @@ and the shell footer shows the API `/health` status.
 - [ ] Create the Firestore database in the console (`nam5`, production mode)
 - [x] Hugging Face account + `HF_TOKEN` GitHub secret (username `BilalSeh`);
       unused since the move to Render, can be deleted
-- [ ] Render account (sign in with GitHub) and a Blueprint from `render.yaml`
+- [x] Render account (sign in with GitHub) and a Blueprint from `render.yaml`
 - [x] Firebase Hosting deploy secret `FIREBASE_SERVICE_ACCOUNT_ROOMCRAFT_PLANNER`
       for GitHub Actions, via `firebase init hosting:github` (service account
       `github-action-1441323664`; the CLI also granted Auth Admin and Functions
