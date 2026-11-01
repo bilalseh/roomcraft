@@ -87,8 +87,8 @@ needed to try every feature.
   token verification on every request, Dockerfile
 - **Data:** Firestore (projects, versions, shares, rate-limit counters),
   Firebase Auth
-- **Hosting (all free):** Firebase Hosting for the frontend; Hugging Face
-  Spaces (Docker) for the FastAPI backend
+- **Hosting (all free):** Firebase Hosting for the frontend; Render's free
+  web service (Docker) for the FastAPI backend
 - **CI:** GitHub Actions running lint, type check, unit tests and build for
   both frontend and backend
 
@@ -129,12 +129,14 @@ plan, so nothing uses Firebase Storage:
 
 ## Backend on free hosting
 
-- Space containers restart and sleep, so the AI rate-limit counters live in
-  Firestore, written by the API through the Firebase Admin SDK (service
-  account stored as a Space secret).
-- Free Spaces sleep after about 48 hours idle. The web app calls `/health` on
-  load to wake the API, and the chat shows a "waking up the assistant" state
-  until it responds.
+- Free Render instances restart and sleep, so the AI rate-limit counters live
+  in Firestore, written by the API through the Firebase Admin SDK (service
+  account stored as a Render environment variable).
+- Free instances sleep after 15 minutes idle and take about a minute to wake.
+  The web app calls `/health` on load to wake the API, and the chat shows a
+  "waking up the assistant" state until it responds.
+- Hugging Face Spaces was the original choice; it now charges for Docker
+  Spaces. See [ADR-0003](adr/0003-api-hosting-on-render.md).
 
 ## Deliverables
 

@@ -7,7 +7,7 @@ export type ApiHealth =
   | { state: "online"; version: string }
   | { state: "offline" };
 
-// A sleeping Hugging Face Space takes up to a few minutes to start.
+// The free API instance sleeps when idle and takes about a minute to wake up.
 export const RETRY_DELAY_MS = 5_000;
 export const GIVE_UP_AFTER_MS = 180_000;
 

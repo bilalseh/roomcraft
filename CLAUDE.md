@@ -9,10 +9,12 @@ Stop after each phase so the user can review.
 
 ## Status
 
-Current phase: **1, built locally (`pnpm check` green); not yet committed or
-deployed.** Remaining: Firebase deploy secret, GitHub Actions variables, first
-push, then verify CI, both deploys, and production cache headers (the Hosting
-emulator ignores custom headers, so they were not verifiable locally).
+Current phase: **1, finishing the API host switch.** `f9b5cb3` is pushed:
+CI checks green, web live on Firebase Hosting with the intended cache headers.
+Its API deploy failed because Hugging Face now charges for Docker Spaces
+(HTTP 402), so the user chose Render (ADR-0003). The Render migration is
+ready locally, not yet committed. Next: push, user creates the Render
+Blueprint, set `VITE_API_URL` to the Render URL, redeploy web, verify.
 
 ### Phase 1 plan (agreed)
 
@@ -26,7 +28,7 @@ emulator ignores custom headers, so they were not verifiable locally).
    the pure-logic home, with an ESLint rule blocking React/three imports.
 3. API shell: FastAPI with `/health` and a `/v1` router, pydantic-settings,
    CORS limited to the hosting origins (including preview channels),
-   multi-stage Dockerfile (non-root, port 7860), `.env.example`.
+   multi-stage Dockerfile (non-root, listens on `$PORT`), `.env.example`.
 4. Schema pipeline proven on one placeholder model: Pydantic →
    `shared/schema/*.json` → generated TS types; CI drift check.
 5. Firebase config: Hosting serves `web/dist` with SPA rewrites and long cache
@@ -34,11 +36,12 @@ emulator ignores custom headers, so they were not verifiable locally).
    `VITE_FIREBASE_*` env vars.
 6. CI: web job (lint, typecheck, test, build), api job (ruff, mypy, pytest,
    Docker build), schema drift check. On main: deploy web to Firebase Hosting
-   (plus PR preview channels) and push `api/` + `shared/` to the HF Space
-   (workflow creates the Space if missing).
-7. Docs: README stub, ADR-0001 (monorepo layout), ADR-0002 (shared schema).
+   (plus PR preview channels). Render deploys the API from `render.yaml`
+   once the commit's checks pass.
+7. Docs: README stub, ADR-0001 (monorepo layout), ADR-0002 (shared schema),
+   ADR-0003 (API hosting on Render).
 
-Done when: CI green, shell live on Firebase Hosting, API live on HF Spaces,
+Done when: CI green, shell live on Firebase Hosting, API live on Render,
 and the shell footer shows the API `/health` status.
 
 ## Decisions (2026-11-01)
@@ -51,9 +54,10 @@ and the shell footer shows the API `/health` status.
   `firebase apps:sdkconfig WEB <appId> --project roomcraft-planner`.
   Hosting URL: https://roomcraft-planner.web.app
 - Firestore: default database in `nam5`.
-- Backend: Hugging Face Spaces, Docker, free CPU basic hardware, public Space.
-  HF username `BilalSeh`; Space `BilalSeh/roomcraft-api`, served at
-  https://bilalseh-roomcraft-api.hf.space
+- Backend: Render free web service (Docker), service `roomcraft-api` in
+  `ohio`, defined in `render.yaml`; expected URL
+  https://roomcraft-api.onrender.com (confirm once created). Sleeps after
+  15 minutes idle. Hugging Face Spaces was dropped: Docker Spaces need PRO.
 - Build-time web config comes from GitHub Actions variables (`VITE_*`), not
   secrets: it is public, and committing the Firebase API key would trip
   GitHub secret scanning.
@@ -81,11 +85,12 @@ and the shell footer shows the API `/health` status.
 ## Pending manual steps
 
 - [ ] Create the Firestore database in the console (`nam5`, production mode)
-- [x] Hugging Face account + write token saved as GitHub secret `HF_TOKEN`
-      (username `BilalSeh`)
+- [x] Hugging Face account + `HF_TOKEN` GitHub secret (username `BilalSeh`);
+      unused since the move to Render, can be deleted
+- [ ] Render account (sign in with GitHub) and a Blueprint from `render.yaml`
 - [x] Firebase Hosting deploy secret `FIREBASE_SERVICE_ACCOUNT_ROOMCRAFT_PLANNER`
       for GitHub Actions, via `firebase init hosting:github` (service account
       `github-action-1441323664`; the CLI also granted Auth Admin and Functions
       Developer, which can be trimmed to least privilege)
 - [ ] Enable Google and Anonymous sign-in (before phase 5)
-- [ ] Gemini API key from Google AI Studio as a Space secret (phase 6)
+- [ ] Gemini API key from Google AI Studio as a Render env var (phase 6)

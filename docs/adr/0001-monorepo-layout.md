@@ -26,8 +26,7 @@ Root scripts give one entry point for both ecosystems: `pnpm dev` starts both se
 `pnpm check` runs the same checks as CI.
 
 The Docker build context is the repository root, so the image can include files from `shared/`.
-The Hugging Face Space receives a copy of `api/` and `shared/` with the Dockerfile at its root,
-which keeps the same paths valid in both places.
+CI and the hosting provider build it the same way: `docker build -f api/Dockerfile .`.
 
 ## Alternatives considered
 

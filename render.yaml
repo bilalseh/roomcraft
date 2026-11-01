@@ -1,0 +1,17 @@
+# Render Blueprint for the API. Spec: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: roomcraft-api
+    runtime: docker
+    plan: free
+    region: ohio
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    # Deploy a commit on main only after its GitHub checks pass.
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - api/**
+        - shared/**
+        - render.yaml

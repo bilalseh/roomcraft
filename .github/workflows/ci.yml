@@ -12,9 +12,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# The API deploys from render.yaml: Render builds a commit on main once these
+# checks pass.
 env:
   FIREBASE_PROJECT: roomcraft-planner
-  HF_SPACE: BilalSeh/roomcraft-api
+  UV_VERSION: 0.12.21
 
 jobs:
   web:
@@ -56,6 +58,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.3
         with:
+          version: ${{ env.UV_VERSION }}
           enable-cache: true
           cache-dependency-glob: api/uv.lock
       - run: uv sync --locked
@@ -68,9 +71,9 @@ jobs:
         run: docker build --file api/Dockerfile --tag roomcraft-api .
       - name: Smoke-test the container
         run: |
-          docker run --detach --publish 7860:7860 --name api roomcraft-api
+          docker run --detach --publish 8000:8000 --name api roomcraft-api
           for attempt in $(seq 30); do
-            if curl --fail --silent http://localhost:7860/health; then exit 0; fi
+            if curl --fail --silent http://localhost:8000/health; then exit 0; fi
             sleep 1
           done
           docker logs api
@@ -88,6 +91,7 @@ jobs:
           cache: pnpm
       - uses: astral-sh/setup-uv@v10.3.3
         with:
+          version: ${{ env.UV_VERSION }}
           enable-cache: true
           cache-dependency-glob: api/uv.lock
       - run: pnpm install --frozen-lockfile
@@ -137,24 +141,3 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ROOMCRAFT_PLANNER }}
           projectId: ${{ env.FIREBASE_PROJECT }}
           channelId: live
-
-  deploy-api:
-    name: Deploy API
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [web, api, schema]
-    runs-on: ubuntu-latest
-    environment:
-      name: api
-      url: https://bilalseh-roomcraft-api.hf.space/docs
-    concurrency: deploy-api
-    steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.3.3
-        with:
-          enable-cache: true
-          cache-dependency-glob: api/uv.lock
-      - name: Push api/ and shared/ to the Hugging Face Space
-        working-directory: api
-        run: uv run --locked python scripts/deploy_space.py "$HF_SPACE"
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}

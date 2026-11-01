@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # The build context is the repository root: docker build -f api/Dockerfile .
-# The Hugging Face Space mirrors that layout, with this file at its root.
+# render.yaml builds it the same way.
 
 FROM python:3.12-slim-trixie AS build
 COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /bin/uv
@@ -19,12 +19,13 @@ RUN uv sync --locked --no-dev --no-editable
 
 
 FROM python:3.12-slim-trixie
-# Hugging Face Spaces run containers as uid 1000.
 RUN useradd --create-home --uid 1000 app
 COPY --from=build /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH" \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PORT=8000
 USER app
 WORKDIR /home/app
-EXPOSE 7860
-CMD ["uvicorn", "roomcraft_api.main:app", "--host", "0.0.0.0", "--port", "7860"]
+EXPOSE 8000
+# Hosts such as Render choose the port through $PORT.
+CMD ["sh", "-c", "exec uvicorn roomcraft_api.main:app --host 0.0.0.0 --port \"$PORT\""]

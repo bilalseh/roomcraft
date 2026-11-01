@@ -3,7 +3,7 @@
 An AI-assisted 3D room planner. Describe a room, furnish it in 3D, ask an AI assistant for layout
 ideas that it applies directly in the scene, track the budget, and share the plan.
 
-**Live app:** https://roomcraft-planner.web.app · **API:** https://bilalseh-roomcraft-api.hf.space/docs
+**Live app:** https://roomcraft-planner.web.app · **API:** https://roomcraft-api.onrender.com/docs
 
 > Work in progress. The [product spec](docs/spec.md) describes the full feature set and the build
 > order.
@@ -13,7 +13,7 @@ ideas that it applies directly in the scene, track the budget, and share the pla
 | Path      | Contents                                                                       |
 | --------- | ------------------------------------------------------------------------------ |
 | `web/`    | React 19 + TypeScript + Vite frontend, React Three Fiber for the 3D editor     |
-| `api/`    | FastAPI backend (Python 3.12, uv), deployed to Hugging Face Spaces (Docker)    |
+| `api/`    | FastAPI backend (Python 3.12, uv), deployed to Render as a Docker image        |
 | `shared/` | Contracts used by both: JSON Schema and the TypeScript types generated from it |
 | `docs/`   | Product spec and [architecture decision records](docs/adr/)                    |
 
@@ -47,9 +47,10 @@ API. `pnpm schema` exports them to `shared/schema/roomcraft.schema.json` and gen
 
 ## Deployment
 
-Every push to `main` that passes CI deploys the web app to Firebase Hosting and pushes `api/` and
-`shared/` to the Hugging Face Space, which builds the Docker image. Pull requests get a Firebase
-Hosting preview channel.
+Every push to `main` that passes CI deploys the web app to Firebase Hosting. Render deploys the
+API from [`render.yaml`](render.yaml) once the same commit's checks pass (see
+[ADR-0003](docs/adr/0003-api-hosting-on-render.md)). Pull requests get a Firebase Hosting preview
+channel.
 
 ## License
 

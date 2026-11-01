@@ -8,5 +8,5 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health")
 async def health() -> HealthResponse:
-    """Liveness probe. The web app also calls it on load to wake a sleeping Space."""
+    """Liveness probe. The web app also calls it on load to wake a sleeping instance."""
     return HealthResponse(status="ok", version=__version__)
