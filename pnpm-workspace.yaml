@@ -1,0 +1,9 @@
+packages:
+  - web
+  - shared
+
+# Optional postinstall scripts: Firebase App Hosting autoinit and a protobufjs
+# version check. Neither is used.
+ignoredBuiltDependencies:
+  - "@firebase/util"
+  - protobufjs

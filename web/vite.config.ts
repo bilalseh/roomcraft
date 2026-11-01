@@ -1,0 +1,22 @@
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    // The API is same-origin in development, so CORS only applies in production.
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:8000",
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
+  test: {
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+    restoreMocks: true,
+    unstubGlobals: true,
+  },
+});

@@ -1,0 +1,6 @@
+# Applies to `docker build -f api/Dockerfile .` (context: repository root).
+*
+!api/pyproject.toml
+!api/uv.lock
+!api/src/
+**/__pycache__

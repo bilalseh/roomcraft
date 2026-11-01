@@ -1,0 +1,160 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  FIREBASE_PROJECT: roomcraft-planner
+  HF_SPACE: BilalSeh/roomcraft-api
+
+jobs:
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-dist
+          path: web/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: api/uv.lock
+      - run: uv sync --locked
+      - run: uv run ruff check
+      - run: uv run ruff format --check
+      - run: uv run mypy
+      - run: uv run pytest
+      - name: Build the Docker image
+        working-directory: .
+        run: docker build --file api/Dockerfile --tag roomcraft-api .
+      - name: Smoke-test the container
+        run: |
+          docker run --detach --publish 7860:7860 --name api roomcraft-api
+          for attempt in $(seq 30); do
+            if curl --fail --silent http://localhost:7860/health; then exit 0; fi
+            sleep 1
+          done
+          docker logs api
+          exit 1
+
+  schema:
+    name: Schema drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: api/uv.lock
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm schema:check
+
+  preview-web:
+    name: Deploy web preview
+    # Fork PRs have no access to the deploy secret.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: [web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-dist
+          path: web/dist
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ROOMCRAFT_PLANNER }}
+          projectId: ${{ env.FIREBASE_PROJECT }}
+          expires: 7d
+
+  deploy-web:
+    name: Deploy web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [web, api, schema]
+    runs-on: ubuntu-latest
+    environment:
+      name: web
+      url: https://roomcraft-planner.web.app
+    concurrency: deploy-web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-dist
+          path: web/dist
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ROOMCRAFT_PLANNER }}
+          projectId: ${{ env.FIREBASE_PROJECT }}
+          channelId: live
+
+  deploy-api:
+    name: Deploy API
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [web, api, schema]
+    runs-on: ubuntu-latest
+    environment:
+      name: api
+      url: https://bilalseh-roomcraft-api.hf.space/docs
+    concurrency: deploy-api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: api/uv.lock
+      - name: Push api/ and shared/ to the Hugging Face Space
+        working-directory: api
+        run: uv run --locked python scripts/deploy_space.py "$HF_SPACE"
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "HealthResponse": {
+      "additionalProperties": false,
+      "description": "Response of `GET /health`.",
+      "properties": {
+        "status": {
+          "const": "ok",
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "version"
+      ],
+      "title": "HealthResponse",
+      "type": "object"
+    }
+  },
+  "title": "Roomcraft shared schema"
+}

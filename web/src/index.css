@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-900 antialiased;
+  }
+}
+
+@utility btn {
+  @apply inline-flex h-11 items-center justify-center rounded-lg px-5 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700;
+}
+
+@utility btn-primary {
+  @apply bg-teal-700 text-white hover:bg-teal-800;
+}
+
+@utility btn-secondary {
+  @apply border border-stone-300 bg-white text-stone-900 hover:bg-stone-100;
+}

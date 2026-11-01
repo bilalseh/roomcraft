@@ -1,0 +1,37 @@
+{
+  "name": "roomcraft",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently --names web,api --prefix-colors cyan,magenta \"pnpm --filter @roomcraft/web dev\" \"pnpm api:dev\"",
+    "build": "pnpm --filter @roomcraft/web build",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm --recursive typecheck",
+    "test": "pnpm --recursive test",
+    "api:dev": "uv run --directory api uvicorn roomcraft_api.main:app --reload --port 8000",
+    "api:check": "uv run --directory api ruff check && uv run --directory api ruff format --check && uv run --directory api mypy && uv run --directory api pytest",
+    "api:docker": "docker build --file api/Dockerfile --tag roomcraft-api .",
+    "schema": "uv run --directory api python scripts/export_schema.py && pnpm --filter @roomcraft/shared generate",
+    "schema:check": "node scripts/check-schema-drift.mjs",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm api:check && pnpm schema:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "concurrently": "10.0.6",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  }
+}
