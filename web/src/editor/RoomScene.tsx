@@ -1,40 +1,50 @@
+import type { Room } from "@roomcraft/shared";
 import { Grid, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { RoomShell } from "./RoomShell";
 
-// Metres. Replaced by the room from the setup wizard.
-const FLOOR = { width: 5, depth: 4 };
+export function RoomScene({ room }: { room: Room }) {
+  const span = Math.max(room.width, room.depth);
 
-export function RoomScene() {
   return (
-    <Canvas camera={{ position: [5, 4.5, 6], fov: 45 }} shadows="percentage" dpr={[1, 2]}>
+    <Canvas
+      shadows="percentage"
+      dpr={[1, 2]}
+      camera={{ position: [span * 0.75, span * 1.05, span * 1.2], fov: 45, near: 0.05, far: 200 }}
+    >
       <color attach="background" args={["#e7e5e4"]} />
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[4, 8, 3]} intensity={1.8} castShadow />
+      <hemisphereLight args={["#ffffff", "#d6cfc7", 1.3]} />
+      <directionalLight
+        position={[span * 0.6, span * 2, span * 0.9]}
+        intensity={1.7}
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.0004}
+        shadow-camera-left={-span}
+        shadow-camera-right={span}
+        shadow-camera-top={span}
+        shadow-camera-bottom={-span}
+      />
 
-      <mesh rotation-x={-Math.PI / 2} receiveShadow>
-        <planeGeometry args={[FLOOR.width, FLOOR.depth]} />
-        <meshStandardMaterial color="#d6c4a8" />
-      </mesh>
+      <RoomShell room={room} />
       <Grid
-        args={[FLOOR.width, FLOOR.depth]}
+        args={[room.width, room.depth]}
         position-y={0.002}
         cellSize={0.5}
         sectionSize={1}
+        cellThickness={0.4}
+        sectionThickness={0.7}
         cellColor="#a8a29e"
-        sectionColor="#78716c"
+        sectionColor="#8b8580"
+        fadeDistance={span * 6}
       />
-
-      <mesh position={[0, 0.4, -1.4]} castShadow>
-        <boxGeometry args={[2, 0.8, 0.9]} />
-        <meshStandardMaterial color="#0f766e" />
-      </mesh>
 
       <OrbitControls
         makeDefault
-        target={[0, 0.5, 0]}
-        maxPolarAngle={Math.PI / 2.1}
-        minDistance={2}
-        maxDistance={20}
+        target={[0, 0.6, 0]}
+        maxPolarAngle={Math.PI / 2.05}
+        minDistance={1.5}
+        maxDistance={span * 4}
       />
     </Canvas>
   );

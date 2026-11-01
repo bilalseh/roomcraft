@@ -19,6 +19,16 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
+      "@typescript-eslint/only-throw-error": [
+        "error",
+        {
+          // Route loaders signal HTTP errors by throwing React Router's data() responses.
+          allow: [{ from: "package", package: "react-router", name: "DataWithResponseInit" }],
+        },
+      ],
+    },
   },
 
   {

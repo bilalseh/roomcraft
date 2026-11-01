@@ -19,6 +19,143 @@
       ],
       "title": "HealthResponse",
       "type": "object"
+    },
+    "Opening": {
+      "additionalProperties": false,
+      "description": "A door or window cut into one wall.",
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/OpeningKind"
+        },
+        "wall": {
+          "$ref": "#/$defs/Wall"
+        },
+        "offset": {
+          "description": "From the wall's start to the near edge.",
+          "maximum": 20,
+          "minimum": 0,
+          "type": "number"
+        },
+        "width": {
+          "maximum": 6,
+          "minimum": 0.3,
+          "type": "number"
+        },
+        "height": {
+          "maximum": 4,
+          "minimum": 0.3,
+          "type": "number"
+        },
+        "sill": {
+          "description": "Height of the bottom edge; 0 for doors.",
+          "maximum": 3,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "wall",
+        "offset",
+        "width",
+        "height",
+        "sill"
+      ],
+      "title": "Opening",
+      "type": "object"
+    },
+    "OpeningKind": {
+      "enum": [
+        "door",
+        "window"
+      ],
+      "type": "string"
+    },
+    "Room": {
+      "additionalProperties": false,
+      "description": "Room dimensions, openings, style and budget, as set in the setup wizard.",
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/RoomType"
+        },
+        "width": {
+          "description": "West to east, inside the walls.",
+          "maximum": 20,
+          "minimum": 1.5,
+          "type": "number"
+        },
+        "depth": {
+          "description": "North to south, inside the walls.",
+          "maximum": 20,
+          "minimum": 1.5,
+          "type": "number"
+        },
+        "height": {
+          "description": "Floor to ceiling.",
+          "maximum": 5,
+          "minimum": 2.1,
+          "type": "number"
+        },
+        "openings": {
+          "items": {
+            "$ref": "#/$defs/Opening"
+          },
+          "maxItems": 16,
+          "type": "array"
+        },
+        "style": {
+          "$ref": "#/$defs/Style"
+        },
+        "budget": {
+          "maximum": 1000000,
+          "minimum": 100,
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "width",
+        "depth",
+        "height",
+        "openings",
+        "style",
+        "budget"
+      ],
+      "title": "Room",
+      "type": "object"
+    },
+    "RoomType": {
+      "enum": [
+        "living_room",
+        "bedroom",
+        "office",
+        "studio"
+      ],
+      "type": "string"
+    },
+    "Style": {
+      "enum": [
+        "modern",
+        "scandinavian",
+        "industrial",
+        "classic"
+      ],
+      "type": "string"
+    },
+    "Wall": {
+      "enum": [
+        "north",
+        "east",
+        "south",
+        "west"
+      ],
+      "type": "string"
     }
   },
   "title": "Roomcraft shared schema"

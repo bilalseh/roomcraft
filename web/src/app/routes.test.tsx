@@ -32,8 +32,10 @@ describe("routes", () => {
 
     await userEvent.click(screen.getByRole("link", { name: "Start a new room" }));
 
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "What kind of room are you planning?" }),
+    ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/new");
-    expect(screen.getByRole("heading", { level: 1, name: "Set up your room" })).toBeInTheDocument();
   });
 
   it("renders the shared plan page", () => {

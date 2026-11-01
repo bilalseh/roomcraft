@@ -1,0 +1,530 @@
+{
+  "description": "Cross-field room rules shared by web/src/domain/room.ts and api/src/roomcraft_api/domain/room.py. Room-level issues come first, then each opening's issues in list order: door_not_at_floor, opening_exceeds_wall, opening_above_ceiling, then openings_overlap against each earlier opening.",
+  "cases": [
+    {
+      "name": "a door and a window that fit",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.0,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": []
+    },
+    {
+      "name": "a room without openings needs a door",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "no_door"
+        }
+      ]
+    },
+    {
+      "name": "windows alone do not make a room reachable",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.0,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "no_door"
+        }
+      ]
+    },
+    {
+      "name": "a door that runs past the end of the north wall",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "north",
+            "offset": 3.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "opening_exceeds_wall",
+          "openingId": "d1"
+        }
+      ]
+    },
+    {
+      "name": "east and west walls are as long as the room is deep",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "east",
+            "offset": 2.5,
+            "width": 1.0,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "opening_exceeds_wall",
+          "openingId": "w1"
+        }
+      ]
+    },
+    {
+      "name": "the same window fits on the longer north wall",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 2.5,
+            "width": 1.0,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": []
+    },
+    {
+      "name": "an opening that ends exactly at the corner fits",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "west",
+            "offset": 2.1,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": []
+    },
+    {
+      "name": "floating-point rounding does not push an opening past the wall",
+      "room": {
+        "type": "living_room",
+        "width": 3.3,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.1,
+            "width": 2.2,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": []
+    },
+    {
+      "name": "a window whose top is above the ceiling",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.0,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 1.5
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "opening_above_ceiling",
+          "openingId": "w1"
+        }
+      ]
+    },
+    {
+      "name": "a window whose top is exactly at the ceiling fits",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.0,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 1.3
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": []
+    },
+    {
+      "name": "a door that does not start at the floor",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.2
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "door_not_at_floor",
+          "openingId": "d1"
+        }
+      ]
+    },
+    {
+      "name": "two openings that overlap on the same wall",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "north",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.0,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "openings_overlap",
+          "openingId": "w1",
+          "otherOpeningId": "d1"
+        }
+      ]
+    },
+    {
+      "name": "openings that touch but do not overlap",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "north",
+            "offset": 0.1,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.0,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": []
+    },
+    {
+      "name": "overlapping spans on different walls do not clash",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 1.0,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 1.0,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": []
+    },
+    {
+      "name": "every problem with one opening is reported, in rule order",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.5,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 3.5,
+            "width": 1.2,
+            "height": 1.2,
+            "sill": 1.5
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "opening_exceeds_wall",
+          "openingId": "w1"
+        },
+        {
+          "code": "opening_above_ceiling",
+          "openingId": "w1"
+        }
+      ]
+    },
+    {
+      "name": "each overlapping pair is reported once, against the earlier opening",
+      "room": {
+        "type": "living_room",
+        "width": 4.0,
+        "depth": 3.0,
+        "height": 2.5,
+        "openings": [
+          {
+            "id": "d1",
+            "kind": "door",
+            "wall": "north",
+            "offset": 0.0,
+            "width": 1.0,
+            "height": 2.1,
+            "sill": 0.0
+          },
+          {
+            "id": "w1",
+            "kind": "window",
+            "wall": "north",
+            "offset": 0.5,
+            "width": 1.0,
+            "height": 1.2,
+            "sill": 0.9
+          },
+          {
+            "id": "w2",
+            "kind": "window",
+            "wall": "north",
+            "offset": 0.8,
+            "width": 1.0,
+            "height": 1.2,
+            "sill": 0.9
+          }
+        ],
+        "style": "modern",
+        "budget": 3000
+      },
+      "issues": [
+        {
+          "code": "openings_overlap",
+          "openingId": "w1",
+          "otherOpeningId": "d1"
+        },
+        {
+          "code": "openings_overlap",
+          "openingId": "w2",
+          "otherOpeningId": "d1"
+        },
+        {
+          "code": "openings_overlap",
+          "openingId": "w2",
+          "otherOpeningId": "w1"
+        }
+      ]
+    }
+  ]
+}

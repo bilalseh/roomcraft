@@ -10,9 +10,11 @@ from pydantic import BaseModel
 from pydantic.json_schema import JsonSchemaMode
 
 from roomcraft_api.schemas.health import HealthResponse
+from roomcraft_api.schemas.room import Opening, Room
 
 SHARED_MODELS: tuple[tuple[type[BaseModel], JsonSchemaMode], ...] = (
     (HealthResponse, "serialization"),
+    (Room, "validation"),
 )
 
-__all__ = ["SHARED_MODELS", "HealthResponse"]
+__all__ = ["SHARED_MODELS", "HealthResponse", "Opening", "Room"]

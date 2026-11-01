@@ -13,7 +13,12 @@ when a phase needs a manual step from the user.
 
 Phase 1: done (verified 2026-11-01: CI green, web on Firebase Hosting, API on
 Render, live footer shows "API online").
-Current phase: **2, in progress** (room setup wizard + procedural room in 3D).
+Phase 2: done. Six-step wizard (RHF + per-step Zod schemas, metric/imperial),
+room rules shared with Python via `shared/fixtures/room-validation.json`,
+procedural 3D room with dollhouse cutaway. Projects are saved to
+localStorage until phase 5 moves them to Firestore.
+Current phase: **3, in progress** (furniture catalog, drag/rotate/snap/collision,
+undo/redo).
 
 ### Phase 1 plan (agreed)
 

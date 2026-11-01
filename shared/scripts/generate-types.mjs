@@ -18,6 +18,8 @@ for (const [name, definition] of Object.entries($defs)) {
       bannerComment: "",
       declareExternallyReferenced: false,
       additionalProperties: false,
+      // Plain arrays instead of one tuple per allowed length; the API enforces the bounds.
+      ignoreMinAndMaxItems: true,
     }),
   );
 }

@@ -8,7 +8,7 @@ export async function fetchHealth(signal: AbortSignal): Promise<HealthResponse> 
     signal: AbortSignal.any([signal, AbortSignal.timeout(REQUEST_TIMEOUT_MS)]),
   });
   if (!response.ok) {
-    throw new Error(`Health check failed with HTTP ${String(response.status)}`);
+    throw new Error(`Health check failed with HTTP ${response.status}`);
   }
   const body: unknown = await response.json();
   if (!isHealthResponse(body)) {

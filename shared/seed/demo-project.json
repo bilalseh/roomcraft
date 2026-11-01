@@ -1,0 +1,40 @@
+{
+  "name": "Sunny living room",
+  "room": {
+    "type": "living_room",
+    "width": 5.2,
+    "depth": 4.2,
+    "height": 2.7,
+    "openings": [
+      {
+        "id": "door",
+        "kind": "door",
+        "wall": "south",
+        "offset": 0.6,
+        "width": 0.9,
+        "height": 2.1,
+        "sill": 0
+      },
+      {
+        "id": "window-north",
+        "kind": "window",
+        "wall": "north",
+        "offset": 1.4,
+        "width": 2.0,
+        "height": 1.5,
+        "sill": 0.75
+      },
+      {
+        "id": "window-east",
+        "kind": "window",
+        "wall": "east",
+        "offset": 1.3,
+        "width": 1.4,
+        "height": 1.5,
+        "sill": 0.75
+      }
+    ],
+    "style": "scandinavian",
+    "budget": 4000
+  }
+}
