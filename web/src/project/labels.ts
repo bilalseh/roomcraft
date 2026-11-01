@@ -1,4 +1,4 @@
-import type { OpeningKind, RoomType, Style, Wall } from "@roomcraft/shared";
+import type { Category, OpeningKind, RoomType, Style, Wall } from "@roomcraft/shared";
 
 interface Described {
   label: string;
@@ -35,3 +35,12 @@ export const WALL_START_CORNERS: Record<Wall, string> = {
 };
 
 export const OPENING_KIND_LABELS: Record<OpeningKind, string> = { door: "Door", window: "Window" };
+
+export const CATEGORY_LABELS: Record<Category, string> = {
+  seating: "Seating",
+  tables: "Tables",
+  storage: "Storage",
+  beds: "Beds",
+  lighting: "Lighting",
+  decor: "Decor",
+};

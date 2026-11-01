@@ -1,6 +1,93 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
+    "CatalogItem": {
+      "additionalProperties": false,
+      "description": "A piece of furniture that can be placed, built in 3D from its `model` kind.",
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 60,
+          "minLength": 1,
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/Category"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelKind"
+        },
+        "layer": {
+          "$ref": "#/$defs/Layer"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "maximum": 6,
+          "type": "number"
+        },
+        "depth": {
+          "exclusiveMinimum": 0,
+          "maximum": 6,
+          "type": "number"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "maximum": 4,
+          "type": "number"
+        },
+        "elevation": {
+          "default": 0,
+          "description": "Bottom height for wall items.",
+          "maximum": 4,
+          "minimum": 0,
+          "type": "number"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceRange"
+        },
+        "color": {
+          "pattern": "^#[0-9a-f]{6}$",
+          "type": "string"
+        },
+        "rooms": {
+          "description": "Room types it suits.",
+          "items": {
+            "$ref": "#/$defs/RoomType"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "category",
+        "model",
+        "layer",
+        "width",
+        "depth",
+        "height",
+        "price",
+        "color",
+        "rooms"
+      ],
+      "title": "CatalogItem",
+      "type": "object"
+    },
+    "Category": {
+      "enum": [
+        "seating",
+        "tables",
+        "storage",
+        "beds",
+        "lighting",
+        "decor"
+      ],
+      "type": "string"
+    },
     "HealthResponse": {
       "additionalProperties": false,
       "description": "Response of `GET /health`.",
@@ -19,6 +106,40 @@
       ],
       "title": "HealthResponse",
       "type": "object"
+    },
+    "Layer": {
+      "enum": [
+        "floor",
+        "rug",
+        "wall",
+        "ceiling"
+      ],
+      "type": "string"
+    },
+    "ModelKind": {
+      "enum": [
+        "sofa",
+        "armchair",
+        "chair",
+        "office_chair",
+        "ottoman",
+        "table",
+        "desk",
+        "bed",
+        "cabinet",
+        "wardrobe",
+        "bookshelf",
+        "media_unit",
+        "floor_lamp",
+        "pendant",
+        "rug",
+        "round_rug",
+        "plant",
+        "wall_art",
+        "mirror",
+        "wall_shelf"
+      ],
+      "type": "string"
     },
     "Opening": {
       "additionalProperties": false,
@@ -76,6 +197,77 @@
         "window"
       ],
       "type": "string"
+    },
+    "Placement": {
+      "additionalProperties": false,
+      "description": "A catalog item placed in the room, positioned by its centre.",
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "itemId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "x": {
+          "description": "West to east, from the room's west wall.",
+          "type": "number"
+        },
+        "z": {
+          "description": "North to south, from the room's north wall.",
+          "type": "number"
+        },
+        "rotation": {
+          "description": "Degrees.",
+          "exclusiveMaximum": 360,
+          "minimum": 0,
+          "multipleOf": 15,
+          "type": "number"
+        },
+        "color": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9a-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "itemId",
+        "x",
+        "z",
+        "rotation"
+      ],
+      "title": "Placement",
+      "type": "object"
+    },
+    "PriceRange": {
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "max": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "PriceRange",
+      "type": "object"
     },
     "Room": {
       "additionalProperties": false,

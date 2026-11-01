@@ -1,0 +1,421 @@
+[
+  {
+    "id": "sofa-three-seat",
+    "name": "Three-seat sofa",
+    "category": "seating",
+    "model": "sofa",
+    "layer": "floor",
+    "width": 2.1,
+    "depth": 0.9,
+    "height": 0.85,
+    "price": {
+      "min": 699,
+      "max": 1299
+    },
+    "color": "#7c8a99",
+    "rooms": ["living_room", "studio"]
+  },
+  {
+    "id": "sofa-two-seat",
+    "name": "Two-seat sofa",
+    "category": "seating",
+    "model": "sofa",
+    "layer": "floor",
+    "width": 1.6,
+    "depth": 0.88,
+    "height": 0.85,
+    "price": {
+      "min": 499,
+      "max": 899
+    },
+    "color": "#b8a48a",
+    "rooms": ["living_room", "studio", "office"]
+  },
+  {
+    "id": "armchair",
+    "name": "Armchair",
+    "category": "seating",
+    "model": "armchair",
+    "layer": "floor",
+    "width": 0.85,
+    "depth": 0.85,
+    "height": 0.9,
+    "price": {
+      "min": 249,
+      "max": 549
+    },
+    "color": "#a3593f",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "dining-chair",
+    "name": "Dining chair",
+    "category": "seating",
+    "model": "chair",
+    "layer": "floor",
+    "width": 0.45,
+    "depth": 0.52,
+    "height": 0.85,
+    "price": {
+      "min": 59,
+      "max": 149
+    },
+    "color": "#8b6a4f",
+    "rooms": ["living_room", "studio", "office"]
+  },
+  {
+    "id": "office-chair",
+    "name": "Office chair",
+    "category": "seating",
+    "model": "office_chair",
+    "layer": "floor",
+    "width": 0.65,
+    "depth": 0.65,
+    "height": 1.1,
+    "price": {
+      "min": 149,
+      "max": 399
+    },
+    "color": "#3f3f46",
+    "rooms": ["office", "studio", "bedroom"]
+  },
+  {
+    "id": "ottoman",
+    "name": "Ottoman",
+    "category": "seating",
+    "model": "ottoman",
+    "layer": "floor",
+    "width": 0.6,
+    "depth": 0.6,
+    "height": 0.45,
+    "price": {
+      "min": 79,
+      "max": 199
+    },
+    "color": "#5f7a6a",
+    "rooms": ["living_room", "bedroom", "studio"]
+  },
+  {
+    "id": "coffee-table",
+    "name": "Coffee table",
+    "category": "tables",
+    "model": "table",
+    "layer": "floor",
+    "width": 1.1,
+    "depth": 0.6,
+    "height": 0.42,
+    "price": {
+      "min": 129,
+      "max": 349
+    },
+    "color": "#9c7a54",
+    "rooms": ["living_room", "studio"]
+  },
+  {
+    "id": "side-table",
+    "name": "Side table",
+    "category": "tables",
+    "model": "table",
+    "layer": "floor",
+    "width": 0.45,
+    "depth": 0.45,
+    "height": 0.55,
+    "price": {
+      "min": 49,
+      "max": 149
+    },
+    "color": "#c2a27c",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "dining-table",
+    "name": "Dining table for four",
+    "category": "tables",
+    "model": "table",
+    "layer": "floor",
+    "width": 1.4,
+    "depth": 0.85,
+    "height": 0.75,
+    "price": {
+      "min": 299,
+      "max": 799
+    },
+    "color": "#a07d58",
+    "rooms": ["living_room", "studio"]
+  },
+  {
+    "id": "desk",
+    "name": "Desk",
+    "category": "tables",
+    "model": "desk",
+    "layer": "floor",
+    "width": 1.4,
+    "depth": 0.7,
+    "height": 0.75,
+    "price": {
+      "min": 199,
+      "max": 499
+    },
+    "color": "#d9c7a7",
+    "rooms": ["office", "bedroom", "studio"]
+  },
+  {
+    "id": "bookshelf",
+    "name": "Bookshelf",
+    "category": "storage",
+    "model": "bookshelf",
+    "layer": "floor",
+    "width": 0.9,
+    "depth": 0.35,
+    "height": 1.9,
+    "price": {
+      "min": 129,
+      "max": 349
+    },
+    "color": "#e7e1d6",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "media-unit",
+    "name": "Media unit with TV",
+    "category": "storage",
+    "model": "media_unit",
+    "layer": "floor",
+    "width": 1.6,
+    "depth": 0.42,
+    "height": 1.25,
+    "price": {
+      "min": 499,
+      "max": 1299
+    },
+    "color": "#3b3b3b",
+    "rooms": ["living_room", "studio", "bedroom"]
+  },
+  {
+    "id": "wardrobe",
+    "name": "Wardrobe",
+    "category": "storage",
+    "model": "wardrobe",
+    "layer": "floor",
+    "width": 1.2,
+    "depth": 0.6,
+    "height": 2.0,
+    "price": {
+      "min": 299,
+      "max": 899
+    },
+    "color": "#ece7df",
+    "rooms": ["bedroom", "studio"]
+  },
+  {
+    "id": "dresser",
+    "name": "Chest of drawers",
+    "category": "storage",
+    "model": "cabinet",
+    "layer": "floor",
+    "width": 1.2,
+    "depth": 0.5,
+    "height": 0.85,
+    "price": {
+      "min": 249,
+      "max": 599
+    },
+    "color": "#c9b79c",
+    "rooms": ["bedroom", "studio"]
+  },
+  {
+    "id": "nightstand",
+    "name": "Nightstand",
+    "category": "storage",
+    "model": "cabinet",
+    "layer": "floor",
+    "width": 0.45,
+    "depth": 0.4,
+    "height": 0.55,
+    "price": {
+      "min": 69,
+      "max": 179
+    },
+    "color": "#c9b79c",
+    "rooms": ["bedroom", "studio"]
+  },
+  {
+    "id": "wall-shelf",
+    "name": "Wall shelf",
+    "category": "storage",
+    "model": "wall_shelf",
+    "layer": "wall",
+    "width": 0.9,
+    "depth": 0.25,
+    "height": 0.3,
+    "elevation": 1.4,
+    "price": {
+      "min": 29,
+      "max": 79
+    },
+    "color": "#8b6a4f",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "bed-single",
+    "name": "Single bed",
+    "category": "beds",
+    "model": "bed",
+    "layer": "floor",
+    "width": 0.95,
+    "depth": 2.05,
+    "height": 0.9,
+    "price": {
+      "min": 199,
+      "max": 499
+    },
+    "color": "#c7cfd9",
+    "rooms": ["bedroom", "studio"]
+  },
+  {
+    "id": "bed-double",
+    "name": "Double bed",
+    "category": "beds",
+    "model": "bed",
+    "layer": "floor",
+    "width": 1.45,
+    "depth": 2.1,
+    "height": 1.0,
+    "price": {
+      "min": 349,
+      "max": 899
+    },
+    "color": "#d8cfc2",
+    "rooms": ["bedroom", "studio"]
+  },
+  {
+    "id": "bed-queen",
+    "name": "Queen bed",
+    "category": "beds",
+    "model": "bed",
+    "layer": "floor",
+    "width": 1.65,
+    "depth": 2.15,
+    "height": 1.05,
+    "price": {
+      "min": 449,
+      "max": 1299
+    },
+    "color": "#b9c4b4",
+    "rooms": ["bedroom", "studio"]
+  },
+  {
+    "id": "floor-lamp",
+    "name": "Floor lamp",
+    "category": "lighting",
+    "model": "floor_lamp",
+    "layer": "floor",
+    "width": 0.4,
+    "depth": 0.4,
+    "height": 1.6,
+    "price": {
+      "min": 49,
+      "max": 189
+    },
+    "color": "#f2e6d0",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "pendant-light",
+    "name": "Pendant light",
+    "category": "lighting",
+    "model": "pendant",
+    "layer": "ceiling",
+    "width": 0.5,
+    "depth": 0.5,
+    "height": 0.35,
+    "price": {
+      "min": 39,
+      "max": 149
+    },
+    "color": "#2f2f2f",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "rug-large",
+    "name": "Large rug",
+    "category": "decor",
+    "model": "rug",
+    "layer": "rug",
+    "width": 2.4,
+    "depth": 1.7,
+    "height": 0.01,
+    "price": {
+      "min": 149,
+      "max": 449
+    },
+    "color": "#c9b8a3",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "rug-round",
+    "name": "Round rug",
+    "category": "decor",
+    "model": "round_rug",
+    "layer": "rug",
+    "width": 1.6,
+    "depth": 1.6,
+    "height": 0.01,
+    "price": {
+      "min": 99,
+      "max": 299
+    },
+    "color": "#8fa3a8",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "plant-tall",
+    "name": "Tall plant",
+    "category": "decor",
+    "model": "plant",
+    "layer": "floor",
+    "width": 0.5,
+    "depth": 0.5,
+    "height": 1.4,
+    "price": {
+      "min": 39,
+      "max": 119
+    },
+    "color": "#4d7c4f",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "wall-art",
+    "name": "Framed print",
+    "category": "decor",
+    "model": "wall_art",
+    "layer": "wall",
+    "width": 0.9,
+    "depth": 0.04,
+    "height": 0.6,
+    "elevation": 1.3,
+    "price": {
+      "min": 49,
+      "max": 199
+    },
+    "color": "#d98e5f",
+    "rooms": ["living_room", "bedroom", "office", "studio"]
+  },
+  {
+    "id": "mirror",
+    "name": "Wall mirror",
+    "category": "decor",
+    "model": "mirror",
+    "layer": "wall",
+    "width": 0.6,
+    "depth": 0.04,
+    "height": 1.2,
+    "elevation": 0.8,
+    "price": {
+      "min": 59,
+      "max": 179
+    },
+    "color": "#b0a18a",
+    "rooms": ["bedroom", "living_room", "studio"]
+  }
+]

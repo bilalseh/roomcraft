@@ -1,12 +1,10 @@
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from roomcraft_api.schemas.base import ApiModel
 
 
-class HealthResponse(BaseModel):
+class HealthResponse(ApiModel):
     """Response of `GET /health`."""
-
-    model_config = ConfigDict(extra="forbid")
 
     status: Literal["ok"]
     version: str

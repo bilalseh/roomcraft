@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import type { Group } from "three";
 import { WALLS } from "../domain/room";
 import { STYLE_PALETTES } from "../domain/styles";
+import { isWallCutAway } from "./cutaway";
 import {
   pointOnWall,
   WALL_THICKNESS,
@@ -17,9 +18,8 @@ const DOOR_OPEN_ANGLE = (75 * Math.PI) / 180;
 const DOOR_THICKNESS = 0.04;
 
 /**
- * Floor, walls with their openings, window glass and open doors. Children are
- * placed in room coordinates (origin at the north-west corner); the group
- * centres the room on the world origin.
+ * Floor, walls with their openings, window glass and open doors, in room
+ * coordinates. The parent group centres the room on the world origin.
  */
 export function RoomShell({ room }: { room: Room }) {
   const palette = STYLE_PALETTES[room.style];
@@ -27,24 +27,15 @@ export function RoomShell({ room }: { room: Room }) {
   const panes = useMemo(() => windowPanes(room, WALL_THICKNESS), [room]);
   const wallGroups = useRef<Partial<Record<Wall, Group | null>>>({});
 
-  // Dollhouse view: hide each wall while the camera is on its outside.
   useFrame(({ camera }) => {
-    const x = camera.position.x + room.width / 2;
-    const z = camera.position.z + room.depth / 2;
-    const outside: Record<Wall, boolean> = {
-      north: z < 0,
-      south: z > room.depth,
-      west: x < 0,
-      east: x > room.width,
-    };
     for (const wall of WALLS) {
       const group = wallGroups.current[wall];
-      if (group) group.visible = !outside[wall];
+      if (group) group.visible = !isWallCutAway(room, wall, camera.position);
     }
   });
 
   return (
-    <group position={[-room.width / 2, 0, -room.depth / 2]}>
+    <group>
       <mesh rotation-x={-Math.PI / 2} position={[room.width / 2, 0, room.depth / 2]} receiveShadow>
         <planeGeometry args={[room.width, room.depth]} />
         <meshStandardMaterial color={palette.floor} roughness={0.8} />

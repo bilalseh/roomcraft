@@ -1,10 +1,22 @@
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, NavLink, Outlet, useMatches } from "react-router";
 import { ApiStatus } from "./ApiStatus";
 import { Logo } from "./Logo";
 
-export function AppLayout() {
+/** Routes with `handle: { fullHeight: true }` fill the window exactly and scroll inside. */
+function isFullHeight(handle: unknown): boolean {
   return (
-    <div className="flex min-h-dvh flex-col">
+    typeof handle === "object" &&
+    handle !== null &&
+    "fullHeight" in handle &&
+    handle.fullHeight === true
+  );
+}
+
+export function AppLayout() {
+  const fullHeight = useMatches().some((match) => isFullHeight(match.handle));
+
+  return (
+    <div className={`flex flex-col ${fullHeight ? "h-dvh" : "min-h-dvh"}`}>
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link
@@ -25,7 +37,7 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col">
+      <main className="flex min-h-0 flex-1 flex-col">
         <Outlet />
       </main>
 

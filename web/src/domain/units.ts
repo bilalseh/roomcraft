@@ -28,8 +28,14 @@ export function formatLength(metres: number, units: Units): string {
   return `${Number(metres.toFixed(2))} m`;
 }
 
-/** "4.5 × 3.6 m" in metric; "14 ft 9 in × 11 ft 10 in" in imperial. */
+/**
+ * "4.5 × 3.6 m", or "210 × 90 cm" when either side is under a metre, so both
+ * numbers share a unit; "14 ft 9 in × 11 ft 10 in" in imperial.
+ */
 export function formatDimensions(width: number, depth: number, units: Units): string {
   if (units === "imperial") return `${formatLength(width, units)} × ${formatLength(depth, units)}`;
-  return `${Number(width.toFixed(2))} × ${formatLength(depth, units)}`;
+  if (Math.min(width, depth) < 1) {
+    return `${Math.round(width * 100)} × ${Math.round(depth * 100)} cm`;
+  }
+  return `${Number(width.toFixed(2))} × ${Number(depth.toFixed(2))} m`;
 }

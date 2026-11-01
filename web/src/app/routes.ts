@@ -21,6 +21,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: "p/:projectId",
+        handle: { fullHeight: true },
         // Lazy so three.js is only downloaded when the editor opens.
         lazy: {
           loader: async () => (await import("../editor/loadProject")).editorLoader,

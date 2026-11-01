@@ -36,5 +36,18 @@
     ],
     "style": "scandinavian",
     "budget": 4000
-  }
+  },
+  "furniture": [
+    { "id": "rug", "itemId": "rug-large", "x": 2.4, "z": 2.1, "rotation": 90 },
+    { "id": "media", "itemId": "media-unit", "x": 0.22, "z": 2.1, "rotation": 90 },
+    { "id": "sofa", "itemId": "sofa-three-seat", "x": 3.6, "z": 2.1, "rotation": 270 },
+    { "id": "coffee-table", "itemId": "coffee-table", "x": 2.4, "z": 2.1, "rotation": 90 },
+    { "id": "side-table", "itemId": "side-table", "x": 3.6, "z": 3.45, "rotation": 0 },
+    { "id": "armchair", "itemId": "armchair", "x": 4.4, "z": 0.7, "rotation": 225 },
+    { "id": "lamp", "itemId": "floor-lamp", "x": 4.95, "z": 1.45, "rotation": 0 },
+    { "id": "bookshelf", "itemId": "bookshelf", "x": 0.75, "z": 0.175, "rotation": 0 },
+    { "id": "plant", "itemId": "plant-tall", "x": 4.85, "z": 3.85, "rotation": 0 },
+    { "id": "print", "itemId": "wall-art", "x": 3.2, "z": 4.18, "rotation": 180 },
+    { "id": "pendant", "itemId": "pendant-light", "x": 2.4, "z": 2.1, "rotation": 0 }
+  ]
 }

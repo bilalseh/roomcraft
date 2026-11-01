@@ -7,7 +7,9 @@ west end of the wall; openings on the east and west walls from the north end.
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from roomcraft_api.schemas.base import ApiModel
 
 type RoomType = Literal["living_room", "bedroom", "office", "studio"]
 type Style = Literal["modern", "scandinavian", "industrial", "classic"]
@@ -15,10 +17,8 @@ type Wall = Literal["north", "east", "south", "west"]
 type OpeningKind = Literal["door", "window"]
 
 
-class Opening(BaseModel):
+class Opening(ApiModel):
     """A door or window cut into one wall."""
-
-    model_config = ConfigDict(extra="forbid")
 
     id: str = Field(min_length=1, max_length=64)
     kind: OpeningKind
@@ -29,10 +29,8 @@ class Opening(BaseModel):
     sill: float = Field(ge=0, le=3, description="Height of the bottom edge; 0 for doors.")
 
 
-class Room(BaseModel):
+class Room(ApiModel):
     """Room dimensions, openings, style and budget, as set in the setup wizard."""
-
-    model_config = ConfigDict(extra="forbid")
 
     type: RoomType
     width: float = Field(ge=1.5, le=20, description="West to east, inside the walls.")

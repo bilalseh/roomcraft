@@ -1,4 +1,4 @@
-import type { Opening, Room } from "@roomcraft/shared";
+import type { Opening, Placement, Room } from "@roomcraft/shared";
 import { z } from "zod";
 import { OPENING_LIMITS, ROOM_LIMITS } from "./limits";
 import { OPENING_KINDS, ROOM_TYPES, STYLES, WALLS } from "./room";
@@ -25,3 +25,16 @@ export const roomSchema = z.strictObject({
   style: z.enum(STYLES),
   budget: z.number().min(ROOM_LIMITS.budget.min).max(ROOM_LIMITS.budget.max),
 }) satisfies z.ZodType<Room>;
+
+export const placementSchema = z.strictObject({
+  id: z.string().min(1).max(64),
+  itemId: z.string().min(1).max(64),
+  x: z.number(),
+  z: z.number(),
+  rotation: z.number().min(0).lt(360).multipleOf(15),
+  color: z
+    .string()
+    .regex(/^#[0-9a-f]{6}$/)
+    .nullable()
+    .exactOptional(),
+}) satisfies z.ZodType<Placement>;

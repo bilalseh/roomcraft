@@ -1,37 +1,54 @@
+import { useState } from "react";
 import { useLoaderData } from "react-router";
-import { usePreferences } from "../app/preferences";
-import { UnitsToggle } from "../components/UnitsToggle";
-import { formatUsd } from "../domain/money";
-import { formatDimensions } from "../domain/units";
-import { ROOM_TYPE_LABELS, STYLE_LABELS } from "../project/labels";
+import { DEMO_PROJECT_ID } from "../project/demoProject";
 import type { editorLoader } from "./loadProject";
+import { NoticeToast } from "./panels/NoticeToast";
+import { SelectionCard } from "./panels/SelectionCard";
+import { Sidebar } from "./panels/Sidebar";
 import { RoomScene } from "./RoomScene";
+import { EditorProvider } from "./state/EditorContext";
+import { createEditorStore } from "./state/editorStore";
+import { useAutosave } from "./state/useAutosave";
+import { useEditorShortcuts } from "./state/useEditorShortcuts";
+import { Toolbar } from "./Toolbar";
 
 export function EditorRoute() {
   const project = useLoaderData<typeof editorLoader>();
-  const units = usePreferences((state) => state.units);
-  const { room } = project;
+  // A new store per project: the route stays mounted when moving between projects.
+  return <Editor key={project.id} />;
+}
+
+function Editor() {
+  const project = useLoaderData<typeof editorLoader>();
+  const [store] = useState(() => createEditorStore(project));
+  const isDemo = project.id === DEMO_PROJECT_ID;
+  useAutosave(store, !isDemo);
+  useEditorShortcuts(store);
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 bg-white px-4 py-3 sm:px-6">
-        <div className="min-w-0">
-          <h1 className="truncate text-lg font-semibold">{project.name}</h1>
-          <p className="text-sm text-stone-600">
-            {ROOM_TYPE_LABELS[room.type].label} · {formatDimensions(room.width, room.depth, units)}{" "}
-            · {STYLE_LABELS[room.style].label} · Budget {formatUsd(room.budget)}
-          </p>
+    <EditorProvider store={store}>
+      <div className="flex min-h-0 flex-1 flex-col">
+        <Toolbar isDemo={isDemo} />
+        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+          <aside
+            aria-label="Furniture"
+            className="order-last max-h-[45vh] border-t border-stone-200 bg-stone-50 lg:order-first lg:max-h-none lg:w-80 lg:border-t-0 lg:border-r"
+          >
+            <Sidebar />
+          </aside>
+          <div className="relative min-h-[24rem] flex-1 bg-stone-200">
+            <div className="absolute inset-0">
+              <RoomScene />
+            </div>
+            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center">
+              <NoticeToast />
+            </div>
+            <div className="pointer-events-none absolute bottom-4 left-4">
+              <SelectionCard />
+            </div>
+          </div>
         </div>
-        <UnitsToggle />
       </div>
-      <div className="relative min-h-[28rem] flex-1 bg-stone-200">
-        <div className="absolute inset-0">
-          <RoomScene room={room} />
-        </div>
-        <p className="pointer-events-none absolute bottom-4 left-4 rounded-lg bg-white/90 px-3 py-2 text-sm text-stone-600 shadow-sm">
-          Drag to orbit, right-drag to pan, scroll to zoom.
-        </p>
-      </div>
-    </div>
+    </EditorProvider>
   );
 }

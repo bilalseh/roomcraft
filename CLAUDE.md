@@ -17,8 +17,12 @@ Phase 2: done. Six-step wizard (RHF + per-step Zod schemas, metric/imperial),
 room rules shared with Python via `shared/fixtures/room-validation.json`,
 procedural 3D room with dollhouse cutaway. Projects are saved to
 localStorage until phase 5 moves them to Firestore.
-Current phase: **3, in progress** (furniture catalog, drag/rotate/snap/collision,
-undo/redo).
+Phase 3: done. 26-item catalog in `shared/catalog`, placement rules (SAT
+collision, layers) shared with Python via `shared/fixtures/placement.json`,
+per-editor Zustand store over pure layout operations with snapshot undo/redo,
+procedural models with instanced legs, drag/snap/rotate, keyboard shortcuts.
+Current phase: **4, in progress** (materials, lighting, camera modes, clearance
+warnings).
 
 ### Phase 1 plan (agreed)
 

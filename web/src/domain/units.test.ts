@@ -34,4 +34,8 @@ describe("formatDimensions", () => {
     expect(formatDimensions(4.5, 3.6, "metric")).toBe("4.5 × 3.6 m");
     expect(formatDimensions(4.5, 3.6, "imperial")).toBe("14 ft 9 in × 11 ft 10 in");
   });
+
+  it("switches both sides to centimetres when either is under a metre", () => {
+    expect(formatDimensions(2.1, 0.9, "metric")).toBe("210 × 90 cm");
+  });
 });
