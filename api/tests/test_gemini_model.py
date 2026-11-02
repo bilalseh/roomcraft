@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from types import SimpleNamespace
 from typing import Any
@@ -20,6 +21,10 @@ from tests.fixtures import SHARED, load_fixture
 CATALOG = load_catalog(SHARED / "catalog" / "catalog.json")
 FIXTURE = load_fixture("operations.json")
 ANSWER = '{"plans": [{"summary": "Cosier.", "operations": []}]}'
+TOO_MANY_PLANS = json.dumps({"plans": [{"summary": "Cosier.", "operations": []}] * 4})
+TOO_MANY_OPERATIONS = json.dumps(
+    {"plans": [{"summary": "Cosier.", "operations": [{"op": "remove", "reason": "Why."}] * 13}]}
+)
 
 
 def refused(code: int, status: str, message: str) -> errors.APIError:
@@ -90,6 +95,18 @@ def test_sends_no_sampling_parameters(monkeypatch: pytest.MonkeyPatch) -> None:
     assert (config.temperature, config.top_p, config.top_k) == (None, None, None)
 
 
+def test_keeps_array_limits_out_of_the_schema(monkeypatch: pytest.MonkeyPatch) -> None:
+    fake = FakeModels([ANSWER])
+
+    run(monkeypatch, fake)
+
+    [config] = fake.configs
+    schema = json.dumps(config.response_json_schema)
+    assert "operations" in schema
+    assert "maxItems" not in schema
+    assert "minItems" not in schema
+
+
 def test_is_busy_when_no_model_can_answer(monkeypatch: pytest.MonkeyPatch) -> None:
     over_quota = refused(429, "RESOURCE_EXHAUSTED", "Over quota")
 
@@ -109,7 +126,11 @@ def test_a_refused_request_stops_and_logs_why(
     assert "400 INVALID_ARGUMENT: API key not valid" in caplog.text
 
 
-@pytest.mark.parametrize("text", ['{"plans": []}', '{"plans": [', None], ids=str)
+@pytest.mark.parametrize(
+    "text",
+    ['{"plans": []}', TOO_MANY_PLANS, TOO_MANY_OPERATIONS, '{"plans": [', None],
+    ids=["no plans", "too many plans", "too many operations", "cut off", "empty"],
+)
 def test_an_unusable_answer_fails_and_logs_why(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, text: str | None
 ) -> None:

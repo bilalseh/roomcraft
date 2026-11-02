@@ -7,7 +7,7 @@ from google import genai
 from google.genai import errors, types
 from pydantic import ValidationError
 
-from roomcraft_api.assistant.plans import PlanResponse
+from roomcraft_api.assistant.plans import PlanResponse, plan_response_schema
 from roomcraft_api.assistant.prompt import SYSTEM_INSTRUCTION, build_contents
 from roomcraft_api.domain.catalog import Catalog
 from roomcraft_api.schemas.operations import AssistRequest
@@ -45,7 +45,7 @@ class GeminiLayoutModel:
         self._config = types.GenerateContentConfig(
             system_instruction=SYSTEM_INSTRUCTION,
             response_mime_type="application/json",
-            response_json_schema=PlanResponse.model_json_schema(),
+            response_json_schema=plan_response_schema(),
         )
 
     async def plan(self, request: AssistRequest) -> PlanResponse:

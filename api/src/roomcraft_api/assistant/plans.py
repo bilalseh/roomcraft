@@ -5,9 +5,11 @@ fields. The server then turns each one into a strict operation, and anything
 incomplete is reported back rather than trusted.
 """
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, ValidationError
+from pydantic.json_schema import GenerateJsonSchema, JsonSchemaValue
+from pydantic_core import core_schema
 
 from roomcraft_api.schemas.materials import FloorMaterial
 from roomcraft_api.schemas.operations import (
@@ -42,6 +44,20 @@ class Plan(BaseModel):
 
 class PlanResponse(BaseModel):
     plans: list[Plan] = Field(min_length=1, max_length=3)
+
+
+class _WithoutArrayLimits(GenerateJsonSchema):
+    def list_schema(self, schema: core_schema.ListSchema) -> JsonSchemaValue:
+        json_schema = super().list_schema(schema)
+        json_schema.pop("minItems", None)
+        json_schema.pop("maxItems", None)
+        return json_schema
+
+
+def plan_response_schema() -> dict[str, Any]:
+    """`PlanResponse` as sent to Gemini, which can answer 400 to `maxItems` on nested arrays.
+    The limits still apply when the answer is validated."""
+    return PlanResponse.model_json_schema(schema_generator=_WithoutArrayLimits)
 
 
 def to_operation(planned: PlannedOperation, new_id: str) -> Operation | None:
