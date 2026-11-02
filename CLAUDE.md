@@ -39,7 +39,11 @@ shared with TS via `shared/fixtures/operations.json`). Web: assistant panel,
 3D previews (violet = added or moved, red ghosts = removed), apply as one undo
 step, three-option mode with thumbnails. Answers 503 until Render has
 `ROOMCRAFT_GEMINI_API_KEY` and `GOOGLE_APPLICATION_CREDENTIALS` (secret file).
-Current phase: **7, in progress** (budget, shopping list, PDF export).
+Phase 7: built and committed locally, not pushed. Budget meter (price range
+against the budget), shopping list grouped by category with CSV, two-page PDF
+(vector floor plan with measurements, 3D snapshot, shopping list) built with
+jsPDF loaded on demand.
+Current phase: **8, in progress** (accessibility, responsive, onboarding).
 
 ### Phase 1 plan (agreed)
 

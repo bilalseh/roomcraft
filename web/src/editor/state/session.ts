@@ -4,6 +4,16 @@ import type { EditorState } from "./editorStore";
 export type Lighting = "day" | "night";
 export type CameraMode = "orbit" | "plan" | "walk";
 
+/** How big a picture of the view to take, and in which format. */
+export interface CaptureOptions {
+  width: number;
+  height: number;
+  type: "image/webp" | "image/jpeg";
+  quality: number;
+}
+
+export type Capture = (options?: CaptureOptions) => string | null;
+
 export interface SaveStatus {
   state: "saved" | "saving" | "error";
   /** When the last save finished, in milliseconds since the epoch. */
@@ -17,8 +27,8 @@ export interface SessionSlice {
   ownerId: string | null;
   shareId: string | null;
   save: SaveStatus;
-  /** Renders the current view as a small WebP data URL, while the scene is mounted. */
-  captureThumbnail: (() => string | null) | null;
+  /** Renders the current view as an image data URL (a small WebP thumbnail by default). */
+  captureThumbnail: Capture | null;
   lighting: Lighting;
   cameraMode: CameraMode;
 
@@ -26,7 +36,7 @@ export interface SessionSlice {
   setCameraMode: (mode: CameraMode) => void;
   setShareId: (shareId: string | null) => void;
   setSave: (save: SaveStatus) => void;
-  setCaptureThumbnail: (capture: (() => string | null) | null) => void;
+  setCaptureThumbnail: (capture: Capture | null) => void;
 }
 
 export interface SessionOptions {

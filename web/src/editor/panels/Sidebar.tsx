@@ -1,5 +1,6 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { useEditor } from "../state/useEditor";
+import { BudgetMeter } from "./BudgetMeter";
 import { CatalogPanel } from "./CatalogPanel";
 import { FinishesPanel } from "./FinishesPanel";
 import { RoomItemsPanel } from "./RoomItemsPanel";
@@ -30,6 +31,7 @@ export function Sidebar() {
 
   return (
     <div className="flex h-full flex-col">
+      <BudgetMeter />
       <div
         role="tablist"
         aria-label="Sidebar"
