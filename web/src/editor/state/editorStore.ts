@@ -19,6 +19,7 @@ import {
 import type { Project } from "../../domain/project";
 import { round, snapToFloor, snapToWall } from "../../domain/snap";
 import { explainProblem } from "./messages";
+import { previewSlice, type PreviewSlice } from "./preview";
 import { sessionSlice, type SessionOptions, type SessionSlice } from "./session";
 
 /** An item being dragged: where it would land, and why it cannot, if it cannot. */
@@ -64,7 +65,7 @@ export interface LayoutSlice {
   dismissNotice: () => void;
 }
 
-export type EditorState = LayoutSlice & SessionSlice;
+export type EditorState = LayoutSlice & SessionSlice & PreviewSlice;
 
 export interface EditorOptions extends SessionOptions {
   newId?: () => string;
@@ -75,6 +76,7 @@ export function createEditorStore(project: Project, options: EditorOptions = {})
   return createStore<EditorState>()((...store) => ({
     ...layoutSlice(project, newId)(...store),
     ...sessionSlice(session)(...store),
+    ...previewSlice(...store),
   }));
 }
 
@@ -196,13 +198,14 @@ function layoutSlice(
         set({ history: record(get().history, restored), selectedId: null, drag: null });
       },
 
+      // Undo and redo also drop any suggestion being previewed.
       undo: () => {
-        set({ history: undo(get().history), drag: null });
+        set({ history: undo(get().history), drag: null, preview: null });
         keepSelectionValid();
       },
 
       redo: () => {
-        set({ history: redo(get().history), drag: null });
+        set({ history: redo(get().history), drag: null, preview: null });
         keepSelectionValid();
       },
 

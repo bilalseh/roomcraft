@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { AssistRequest, AssistResponse } from "@roomcraft/shared";
 import type { Account } from "../data/auth";
 import type { StoredProject } from "../data/projects";
 import type { SharedPlan } from "../data/shares";
@@ -20,6 +21,8 @@ const state = {
   versions: new Map<string, Version[]>(),
   shares: new Map<string, SharedPlan>(),
   thumbnails: new Map<string, string>(),
+  assistantReply: null as AssistResponse | Error | null,
+  assistantRequests: [] as AssistRequest[],
   next: 0,
 };
 
@@ -44,6 +47,8 @@ export function resetFakeBackend(): void {
   state.versions.clear();
   state.shares.clear();
   state.thumbnails.clear();
+  state.assistantReply = null;
+  state.assistantRequests = [];
   state.next = 0;
   useAccount.setState({ status: "loading", account: null });
 }
@@ -159,4 +164,30 @@ export const thumbnails = {
     return Promise.resolve();
   },
   getThumbnail: (id: string) => Promise.resolve(state.thumbnails.get(id) ?? null),
+};
+
+/** What the assistant answers next: a response, or an error to throw. */
+export function setAssistantReply(reply: AssistResponse | Error): void {
+  state.assistantReply = reply;
+}
+
+export function assistantRequests(): AssistRequest[] {
+  return state.assistantRequests;
+}
+
+export const assistant = {
+  AssistantError: class AssistantError extends Error {
+    constructor(
+      message: string,
+      readonly status: number | null,
+    ) {
+      super(message);
+    }
+  },
+  askAssistant: (request: AssistRequest) => {
+    state.assistantRequests.push(request);
+    const reply = state.assistantReply;
+    if (!reply) return Promise.reject(new Error("No assistant reply set"));
+    return reply instanceof Error ? Promise.reject(reply) : Promise.resolve(reply);
+  },
 };

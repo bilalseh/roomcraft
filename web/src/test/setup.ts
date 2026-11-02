@@ -9,6 +9,7 @@ vi.mock("../data/projects", async () => (await import("./fakeBackend")).projects
 vi.mock("../data/versions", async () => (await import("./fakeBackend")).versions);
 vi.mock("../data/shares", async () => (await import("./fakeBackend")).shares);
 vi.mock("../data/thumbnails", async () => (await import("./fakeBackend")).thumbnails);
+vi.mock("../data/assistant", async () => (await import("./fakeBackend")).assistant);
 
 // jsdom has the <dialog> element but none of its methods.
 const dialog: Partial<Pick<HTMLDialogElement, "showModal" | "close">> = HTMLDialogElement.prototype;

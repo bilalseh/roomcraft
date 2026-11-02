@@ -21,9 +21,11 @@ RUN uv sync --locked --no-dev --no-editable
 FROM python:3.12-slim-trixie
 RUN useradd --create-home --uid 1000 app
 COPY --from=build /app/.venv /app/.venv
+COPY shared/catalog/catalog.json /app/shared/catalog/catalog.json
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=8000 \
+    ROOMCRAFT_CATALOG_PATH=/app/shared/catalog/catalog.json
 USER app
 WORKDIR /home/app
 EXPOSE 8000

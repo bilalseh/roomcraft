@@ -1,0 +1,595 @@
+{
+  "description": "Assistant operations applied in order by web/src/domain/operations.ts and api/src/roomcraft_api/domain/operations.py. Each operation sees the layout left by the ones before it. Rotations snap to 15 degrees; wall pieces snap onto the nearest wall facing into the room. Refused: unknown items or pieces, outside the room, overlapping a piece on the same layer, a floor piece in a door's swing, wall pieces turned, and additions that push the lowest total price over the budget.",
+  "room": {
+    "type": "living_room",
+    "width": 5.0,
+    "depth": 4.0,
+    "height": 2.6,
+    "style": "modern",
+    "budget": 1000,
+    "openings": [
+      {
+        "id": "door",
+        "kind": "door",
+        "wall": "south",
+        "offset": 0.5,
+        "width": 0.9,
+        "height": 2.1,
+        "sill": 0
+      }
+    ]
+  },
+  "materials": {
+    "floor": "wood",
+    "floorColor": "#c9c1b6",
+    "wallColor": "#f3f2ef"
+  },
+  "furniture": [
+    {
+      "id": "sofa",
+      "itemId": "sofa-three-seat",
+      "x": 2.5,
+      "z": 0.45,
+      "rotation": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "an addition that fits is accepted",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 1.6,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 1.6,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "rejected": [],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        },
+        {
+          "id": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 1.6,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "additions must stay within the budget",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "s2",
+          "itemId": "sofa-two-seat",
+          "x": 2.5,
+          "z": 2.5,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [],
+      "rejected": [
+        {
+          "index": 0,
+          "code": "over_budget"
+        }
+      ],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "an addition that overlaps is refused, naming what it hits",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 0.8,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [],
+      "rejected": [
+        {
+          "index": 0,
+          "code": "overlaps",
+          "otherId": "sofa"
+        }
+      ],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "an addition outside the room is refused",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 4.8,
+          "z": 2,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [],
+      "rejected": [
+        {
+          "index": 0,
+          "code": "outside_room"
+        }
+      ],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "unknown catalog items are refused",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "x",
+          "itemId": "throne",
+          "x": 2.5,
+          "z": 2,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [],
+      "rejected": [
+        {
+          "index": 0,
+          "code": "unknown_item"
+        }
+      ],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "a floor piece in a door's swing is refused",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "a1",
+          "itemId": "armchair",
+          "x": 0.9,
+          "z": 3.5,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [],
+      "rejected": [
+        {
+          "index": 0,
+          "code": "blocks_door",
+          "openingId": "door"
+        }
+      ],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "moves and turns apply in order, and rotation snaps to 15 degrees",
+      "operations": [
+        {
+          "op": "move",
+          "placementId": "sofa",
+          "x": 2.5,
+          "z": 2.0,
+          "reason": "Suggested."
+        },
+        {
+          "op": "rotate",
+          "placementId": "sofa",
+          "rotation": 92,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [
+        {
+          "op": "move",
+          "placementId": "sofa",
+          "x": 2.5,
+          "z": 2.0,
+          "reason": "Suggested."
+        },
+        {
+          "op": "rotate",
+          "placementId": "sofa",
+          "rotation": 90,
+          "reason": "Suggested."
+        }
+      ],
+      "rejected": [],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 2.0,
+          "rotation": 90
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "pieces that are not in the room cannot be moved",
+      "operations": [
+        {
+          "op": "move",
+          "placementId": "ghost",
+          "x": 1,
+          "z": 1,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [],
+      "rejected": [
+        {
+          "index": 0,
+          "code": "unknown_placement"
+        }
+      ],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "wall pieces hang on the nearest wall and cannot turn",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "art",
+          "itemId": "wall-art",
+          "x": 1.04,
+          "z": 0.5,
+          "rotation": 33,
+          "reason": "Suggested."
+        },
+        {
+          "op": "rotate",
+          "placementId": "art",
+          "rotation": 90,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [
+        {
+          "op": "add",
+          "placementId": "art",
+          "itemId": "wall-art",
+          "x": 1.0,
+          "z": 0.02,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "rejected": [
+        {
+          "index": 1,
+          "code": "fixed_rotation"
+        }
+      ],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        },
+        {
+          "id": "art",
+          "itemId": "wall-art",
+          "x": 1.0,
+          "z": 0.02,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "removing a piece frees its budget for the next operation",
+      "operations": [
+        {
+          "op": "remove",
+          "placementId": "sofa",
+          "reason": "Suggested."
+        },
+        {
+          "op": "add",
+          "placementId": "s2",
+          "itemId": "sofa-two-seat",
+          "x": 2.5,
+          "z": 2.5,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [
+        {
+          "op": "remove",
+          "placementId": "sofa",
+          "reason": "Suggested."
+        },
+        {
+          "op": "add",
+          "placementId": "s2",
+          "itemId": "sofa-two-seat",
+          "x": 2.5,
+          "z": 2.5,
+          "rotation": 0,
+          "reason": "Suggested."
+        }
+      ],
+      "rejected": [],
+      "furniture": [
+        {
+          "id": "s2",
+          "itemId": "sofa-two-seat",
+          "x": 2.5,
+          "z": 2.5,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "finishes change without touching the furniture",
+      "operations": [
+        {
+          "op": "material",
+          "floor": "carpet",
+          "floorColor": "#55565a",
+          "wallColor": null,
+          "reason": "Warmer underfoot."
+        }
+      ],
+      "accepted": [
+        {
+          "op": "material",
+          "floor": "carpet",
+          "floorColor": "#55565a",
+          "wallColor": null,
+          "reason": "Warmer underfoot."
+        }
+      ],
+      "rejected": [],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "carpet",
+        "floorColor": "#55565a",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "a new piece can be moved by a later operation",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 1.6,
+          "rotation": 0,
+          "reason": "Suggested."
+        },
+        {
+          "op": "move",
+          "placementId": "t1",
+          "x": 2.5,
+          "z": 2.4,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 1.6,
+          "rotation": 0,
+          "reason": "Suggested."
+        },
+        {
+          "op": "move",
+          "placementId": "t1",
+          "x": 2.5,
+          "z": 2.4,
+          "reason": "Suggested."
+        }
+      ],
+      "rejected": [],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        },
+        {
+          "id": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 2.4,
+          "rotation": 0
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    },
+    {
+      "name": "an added piece's rotation snaps to the nearest 15 degrees",
+      "operations": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 2,
+          "rotation": 352,
+          "reason": "Suggested."
+        }
+      ],
+      "accepted": [
+        {
+          "op": "add",
+          "placementId": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 2,
+          "rotation": 345,
+          "reason": "Suggested."
+        }
+      ],
+      "rejected": [],
+      "furniture": [
+        {
+          "id": "sofa",
+          "itemId": "sofa-three-seat",
+          "x": 2.5,
+          "z": 0.45,
+          "rotation": 0
+        },
+        {
+          "id": "t1",
+          "itemId": "coffee-table",
+          "x": 2.5,
+          "z": 2,
+          "rotation": 345
+        }
+      ],
+      "materials": {
+        "floor": "wood",
+        "floorColor": "#c9c1b6",
+        "wallColor": "#f3f2ef"
+      }
+    }
+  ]
+}

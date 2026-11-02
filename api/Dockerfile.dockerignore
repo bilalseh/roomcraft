@@ -3,4 +3,5 @@
 !api/pyproject.toml
 !api/uv.lock
 !api/src/
+!shared/catalog/catalog.json
 **/__pycache__

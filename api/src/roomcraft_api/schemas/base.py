@@ -12,4 +12,6 @@ class ApiModel(BaseModel):
         validate_by_name=True,
         validate_by_alias=True,
         serialize_by_alias=True,
+        # Responses always include defaulted fields, so their schemas mark them required.
+        json_schema_serialization_defaults_required=True,
     )

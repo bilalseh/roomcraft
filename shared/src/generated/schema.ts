@@ -1,5 +1,34 @@
 // Generated from shared/schema by `pnpm schema`. Do not edit.
 
+export interface AddOperation {
+  op: "add";
+  placementId: string;
+  itemId: string;
+  x: number;
+  z: number;
+  rotation: number;
+  reason: string;
+}
+
+export interface AssistRequest {
+  prompt: string;
+  room: Room;
+  /**
+   * @maxItems 100
+   */
+  furniture: Placement[];
+  materials: Materials;
+  /**
+   * How many alternative layouts.
+   */
+  options?: 1 | 3;
+}
+
+export interface AssistResponse {
+  suggestions: Suggestion[];
+  remainingToday: number;
+}
+
 /**
  * A piece of furniture that can be placed, built in 3D from its `model` kind.
  */
@@ -40,6 +69,14 @@ export interface HealthResponse {
 
 export type Layer = "floor" | "rug" | "wall" | "ceiling";
 
+export interface MaterialOperation {
+  op: "material";
+  floor: FloorMaterial | null;
+  floorColor: string | null;
+  wallColor: string | null;
+  reason: string;
+}
+
 /**
  * The room's finishes: floor material and colour, and wall paint.
  */
@@ -71,6 +108,14 @@ export type ModelKind =
   | "mirror"
   | "wall_shelf";
 
+export interface MoveOperation {
+  op: "move";
+  placementId: string;
+  x: number;
+  z: number;
+  reason: string;
+}
+
 /**
  * A door or window cut into one wall.
  */
@@ -91,6 +136,18 @@ export interface Opening {
 }
 
 export type OpeningKind = "door" | "window";
+
+export type Operation = AddOperation | MoveOperation | RotateOperation | RemoveOperation | MaterialOperation;
+
+export type OperationProblemCode =
+  | "invalid_operation"
+  | "unknown_item"
+  | "unknown_placement"
+  | "outside_room"
+  | "overlaps"
+  | "blocks_door"
+  | "over_budget"
+  | "fixed_rotation";
 
 /**
  * A catalog item placed in the room, positioned by its centre.
@@ -116,6 +173,23 @@ export interface Placement {
 export interface PriceRange {
   min: number;
   max: number;
+}
+
+/**
+ * A proposed change the server refused, and why.
+ */
+export interface RejectedOperation {
+  op: string;
+  reason: string;
+  code: OperationProblemCode;
+  otherId: string | null;
+  openingId: string | null;
+}
+
+export interface RemoveOperation {
+  op: "remove";
+  placementId: string;
+  reason: string;
 }
 
 /**
@@ -145,6 +219,19 @@ export interface Room {
 
 export type RoomType = "living_room" | "bedroom" | "office" | "studio";
 
+export interface RotateOperation {
+  op: "rotate";
+  placementId: string;
+  rotation: number;
+  reason: string;
+}
+
 export type Style = "modern" | "scandinavian" | "industrial" | "classic";
+
+export interface Suggestion {
+  summary: string;
+  operations: Operation[];
+  rejected: RejectedOperation[];
+}
 
 export type Wall = "north" | "east" | "south" | "west";

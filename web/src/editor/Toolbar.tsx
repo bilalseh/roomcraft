@@ -12,7 +12,12 @@ import { useEditor } from "./state/useEditor";
 const BUTTON =
   "rounded-md border border-stone-300 px-3 py-1.5 text-sm hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:opacity-40";
 
-export function Toolbar() {
+interface ToolbarProps {
+  assistantOpen: boolean;
+  onToggleAssistant: () => void;
+}
+
+export function Toolbar({ assistantOpen, onToggleAssistant }: ToolbarProps) {
   const name = useEditor((state) => state.project.name);
   const room = useEditor((state) => state.history.present.room);
   const canUndo = useEditor((state) => state.history.past.length > 0);
@@ -76,6 +81,15 @@ export function Toolbar() {
             Share
           </button>
         </div>
+        <button
+          type="button"
+          aria-expanded={assistantOpen}
+          aria-controls="layout-assistant"
+          onClick={onToggleAssistant}
+          className="rounded-md bg-violet-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-700"
+        >
+          Assistant
+        </button>
         <UnitsToggle />
       </div>
       <VersionsDialog open={dialog === "versions"} onClose={close} />

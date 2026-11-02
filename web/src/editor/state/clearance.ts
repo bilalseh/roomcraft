@@ -23,7 +23,7 @@ export function layoutClearance(layout: Layout): ClearanceIssue[] {
 
 /** Clearance warnings for the current layout; recomputed only when the layout changes. */
 export function useClearanceIssues(): ClearanceIssue[] {
-  return layoutClearance(useEditor((state) => state.history.present));
+  return layoutClearance(useEditor((state) => state.preview?.layout ?? state.history.present));
 }
 
 export function explainClearance(issue: ClearanceIssue, layout: Layout, units: Units): string {

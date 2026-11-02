@@ -19,6 +19,14 @@ export function useEditorShortcuts(store: EditorStore) {
       if (isTyping(event.target)) return;
       const state = store.getState();
       const key = event.key.toLowerCase();
+      // While a suggestion is previewed, the room cannot be edited; Escape discards it.
+      if (state.preview) {
+        if (key === "escape") {
+          state.discardPreview();
+          event.preventDefault();
+        }
+        return;
+      }
       const command = event.ctrlKey || event.metaKey;
 
       if (command && key === "z") {

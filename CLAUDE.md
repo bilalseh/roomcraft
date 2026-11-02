@@ -32,8 +32,14 @@ enabling Firebase Authentication (anonymous sign-in returns
 CONFIGURATION_NOT_FOUND). After that: browser-check /demo, autosave, versions,
 share link and My rooms against the real project, then push.
 Rules tests run only in CI (local Java is 8).
-Current phase: **6, in progress** (FastAPI AI assistant). Needs the Gemini key
-and a `roomcraft-api` service account (Cloud Datastore User) on Render.
+Phase 6: built and committed locally, not pushed. `POST /v1/assist` (Firebase
+ID token, 20 requests a day counted in Firestore, Gemini `gemini-3.8-flash`
+with `gemini-3.5-flash-lite` fallback, operations validated in order and
+shared with TS via `shared/fixtures/operations.json`). Web: assistant panel,
+3D previews (violet = added or moved, red ghosts = removed), apply as one undo
+step, three-option mode with thumbnails. Answers 503 until Render has
+`ROOMCRAFT_GEMINI_API_KEY` and `GOOGLE_APPLICATION_CREDENTIALS` (secret file).
+Current phase: **7, in progress** (budget, shopping list, PDF export).
 
 ### Phase 1 plan (agreed)
 

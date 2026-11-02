@@ -1,6 +1,110 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
+    "AddOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "add",
+          "type": "string"
+        },
+        "placementId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "itemId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "x": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        },
+        "rotation": {
+          "default": 0,
+          "type": "number"
+        },
+        "reason": {
+          "maxLength": 200,
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "placementId",
+        "itemId",
+        "x",
+        "z",
+        "rotation",
+        "reason"
+      ],
+      "title": "AddOperation",
+      "type": "object"
+    },
+    "AssistRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "prompt": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
+        "room": {
+          "$ref": "#/$defs/Room"
+        },
+        "furniture": {
+          "items": {
+            "$ref": "#/$defs/Placement"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "materials": {
+          "$ref": "#/$defs/Materials"
+        },
+        "options": {
+          "default": 1,
+          "description": "How many alternative layouts.",
+          "enum": [
+            1,
+            3
+          ],
+          "type": "integer"
+        }
+      },
+      "required": [
+        "prompt",
+        "room",
+        "furniture",
+        "materials"
+      ],
+      "title": "AssistRequest",
+      "type": "object"
+    },
+    "AssistResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "suggestions": {
+          "items": {
+            "$ref": "#/$defs/Suggestion"
+          },
+          "type": "array"
+        },
+        "remainingToday": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "suggestions",
+        "remainingToday"
+      ],
+      "title": "AssistResponse",
+      "type": "object"
+    },
     "CatalogItem": {
       "additionalProperties": false,
       "description": "A piece of furniture that can be placed, built in 3D from its `model` kind.",
@@ -124,6 +228,63 @@
       ],
       "type": "string"
     },
+    "MaterialOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "material",
+          "type": "string"
+        },
+        "floor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FloorMaterial"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "floorColor": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9a-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "wallColor": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9a-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "maxLength": 200,
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "floor",
+        "floorColor",
+        "wallColor",
+        "reason"
+      ],
+      "title": "MaterialOperation",
+      "type": "object"
+    },
     "Materials": {
       "additionalProperties": false,
       "description": "The room's finishes: floor material and colour, and wall paint.",
@@ -172,6 +333,39 @@
         "wall_shelf"
       ],
       "type": "string"
+    },
+    "MoveOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "move",
+          "type": "string"
+        },
+        "placementId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "x": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        },
+        "reason": {
+          "maxLength": 200,
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "placementId",
+        "x",
+        "z",
+        "reason"
+      ],
+      "title": "MoveOperation",
+      "type": "object"
     },
     "Opening": {
       "additionalProperties": false,
@@ -227,6 +421,48 @@
       "enum": [
         "door",
         "window"
+      ],
+      "type": "string"
+    },
+    "Operation": {
+      "discriminator": {
+        "mapping": {
+          "add": "#/$defs/AddOperation",
+          "material": "#/$defs/MaterialOperation",
+          "move": "#/$defs/MoveOperation",
+          "remove": "#/$defs/RemoveOperation",
+          "rotate": "#/$defs/RotateOperation"
+        },
+        "propertyName": "op"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/AddOperation"
+        },
+        {
+          "$ref": "#/$defs/MoveOperation"
+        },
+        {
+          "$ref": "#/$defs/RotateOperation"
+        },
+        {
+          "$ref": "#/$defs/RemoveOperation"
+        },
+        {
+          "$ref": "#/$defs/MaterialOperation"
+        }
+      ]
+    },
+    "OperationProblemCode": {
+      "enum": [
+        "invalid_operation",
+        "unknown_item",
+        "unknown_placement",
+        "outside_room",
+        "overlaps",
+        "blocks_door",
+        "over_budget",
+        "fixed_rotation"
       ],
       "type": "string"
     },
@@ -301,6 +537,77 @@
       "title": "PriceRange",
       "type": "object"
     },
+    "RejectedOperation": {
+      "additionalProperties": false,
+      "description": "A proposed change the server refused, and why.",
+      "properties": {
+        "op": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "code": {
+          "$ref": "#/$defs/OperationProblemCode"
+        },
+        "otherId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "openingId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "op",
+        "reason",
+        "code",
+        "otherId",
+        "openingId"
+      ],
+      "title": "RejectedOperation",
+      "type": "object"
+    },
+    "RemoveOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "remove",
+          "type": "string"
+        },
+        "placementId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "maxLength": 200,
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "placementId",
+        "reason"
+      ],
+      "title": "RemoveOperation",
+      "type": "object"
+    },
     "Room": {
       "additionalProperties": false,
       "description": "Room dimensions, openings, style and budget, as set in the setup wizard.",
@@ -363,6 +670,35 @@
       ],
       "type": "string"
     },
+    "RotateOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "rotate",
+          "type": "string"
+        },
+        "placementId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "rotation": {
+          "type": "number"
+        },
+        "reason": {
+          "maxLength": 200,
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "placementId",
+        "rotation",
+        "reason"
+      ],
+      "title": "RotateOperation",
+      "type": "object"
+    },
     "Style": {
       "enum": [
         "modern",
@@ -371,6 +707,33 @@
         "classic"
       ],
       "type": "string"
+    },
+    "Suggestion": {
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "operations": {
+          "items": {
+            "$ref": "#/$defs/Operation"
+          },
+          "type": "array"
+        },
+        "rejected": {
+          "items": {
+            "$ref": "#/$defs/RejectedOperation"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "summary",
+        "operations",
+        "rejected"
+      ],
+      "title": "Suggestion",
+      "type": "object"
     },
     "Wall": {
       "enum": [

@@ -6,6 +6,8 @@ license = "MIT"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.162",
+    "firebase-admin>=7.7",
+    "google-genai>=2.34",
     "pydantic>=2.14",
     "pydantic-settings>=2.16",
     "uvicorn[standard]>=0.54",
@@ -34,12 +36,18 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]
+# Tests assert, and use made-up tokens.
+"tests/**" = ["S101", "S105", "S106"]
 
 [tool.mypy]
 strict = true
 files = ["src", "tests", "scripts"]
 plugins = ["pydantic.mypy"]
+
+# firebase-admin ships no type information.
+[[tool.mypy.overrides]]
+module = ["firebase_admin", "firebase_admin.*"]
+ignore_missing_imports = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

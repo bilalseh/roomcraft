@@ -12,7 +12,9 @@ const NIGHT = { background: "#18202c", sky: 0.12, sun: 0.15 };
 
 export function RoomScene() {
   const room = useEditor((state) => state.history.present.room);
-  const materials = useEditor((state) => state.history.present.materials);
+  const materials = useEditor(
+    (state) => (state.preview?.layout ?? state.history.present).materials,
+  );
   const mode = useEditor((state) => state.cameraMode);
   const night = useEditor((state) => state.lighting === "night");
   const select = useEditor((state) => state.select);

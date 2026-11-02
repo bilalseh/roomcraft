@@ -64,6 +64,11 @@ function alongWall(value: number, half: number, length: number): number {
   return round(Math.min(Math.max(snapped, half), Math.max(half, length - half)));
 }
 
+/** The nearest 15 degree step, between 0 and 345. */
+export function normalizeRotation(degrees: number): number {
+  return (((Math.round(degrees / 15) * 15) % 360) + 360) % 360;
+}
+
 /** Millimetre precision keeps grid arithmetic (0.1 + 0.2) out of stored positions. */
 export function round(value: number): number {
   return Math.round(value * 1000) / 1000;

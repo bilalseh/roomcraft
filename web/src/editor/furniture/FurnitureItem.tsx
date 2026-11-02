@@ -11,6 +11,7 @@ const FLOOR = new Plane(new Vector3(0, 1, 0), 0);
 const SELECTED = "#0f766e";
 const INVALID = "#dc2626";
 const WARNING = "#d97706";
+const SUGGESTED = "#7c3aed";
 
 interface FurnitureItemProps {
   placement: Placement;
@@ -20,6 +21,8 @@ interface FurnitureItemProps {
   lit: boolean;
   /** Part of a clearance warning. */
   warned: boolean;
+  /** Added or moved by the suggestion being previewed. */
+  suggested: boolean;
 }
 
 /**
@@ -32,11 +35,14 @@ export const FurnitureItem = memo(function FurnitureItem({
   room,
   lit,
   warned,
+  suggested,
 }: FurnitureItemProps) {
   const store = useEditorStore();
   const drag = useEditor((state) => (state.drag?.id === placement.id ? state.drag : null));
   const selected = useEditor((state) => state.selectedId === placement.id);
-  const editable = useEditor((state) => !state.readOnly && state.cameraMode !== "walk");
+  const editable = useEditor(
+    (state) => !state.readOnly && state.preview === null && state.cameraMode !== "walk",
+  );
   const controls = useThree((state) => state.controls);
   const grab = useRef<{ dx: number; dz: number } | null>(null);
   const hit = useMemo(() => new Vector3(), []);
@@ -97,10 +103,28 @@ export const FurnitureItem = memo(function FurnitureItem({
       {(selected || drag) && (
         <SelectionBox item={item} color={drag?.problem ? INVALID : SELECTED} />
       )}
-      {warned && !selected && !drag && <SelectionBox item={item} color={WARNING} />}
+      {suggested && <SelectionBox item={item} color={SUGGESTED} />}
+      {warned && !suggested && !selected && !drag && <SelectionBox item={item} color={WARNING} />}
     </group>
   );
 });
+
+/** A piece the previewed suggestion would remove: a red, see-through box where it stands. */
+export function RemovedGhost({ placement, item }: { placement: Placement; item: CatalogItem }) {
+  const y = item.layer === "wall" ? (item.elevation ?? 0) : 0;
+  return (
+    <group
+      position={[placement.x, y, placement.z]}
+      rotation-y={(placement.rotation * Math.PI) / 180}
+    >
+      <mesh position={[0, item.height / 2, 0]} raycast={() => null}>
+        <boxGeometry args={[item.width, item.height, item.depth]} />
+        <meshBasicMaterial color={INVALID} transparent opacity={0.18} depthWrite={false} />
+        <Edges color={INVALID} />
+      </mesh>
+    </group>
+  );
+}
 
 /** Wall pieces disappear with their wall in the dollhouse view; others always show. */
 function HiddenWithWall(props: { room: Room; rotation: number | null; children: ReactNode }) {

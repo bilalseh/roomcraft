@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLoaderData } from "react-router";
+import { AssistantPanel } from "./assistant/AssistantPanel";
 import type { editorLoader } from "./loadProject";
 import { NoticeToast } from "./panels/NoticeToast";
 import { SelectionCard } from "./panels/SelectionCard";
@@ -23,13 +24,19 @@ export function EditorRoute() {
 function Editor() {
   const { project, ownerId, shareId } = useLoaderData<typeof editorLoader>();
   const [store] = useState(() => createEditorStore(project, { ownerId, shareId }));
+  const [assistantOpen, setAssistantOpen] = useState(false);
   useAutosave(store);
   useEditorShortcuts(store);
 
   return (
     <EditorProvider store={store}>
       <div className="flex min-h-0 flex-1 flex-col">
-        <Toolbar />
+        <Toolbar
+          assistantOpen={assistantOpen}
+          onToggleAssistant={() => {
+            setAssistantOpen(!assistantOpen);
+          }}
+        />
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           <aside
             aria-label="Furniture"
@@ -53,6 +60,19 @@ function Editor() {
               <WalkHint />
             </div>
           </div>
+          {/* Stays mounted while closed, so the conversation is kept. */}
+          <aside
+            id="layout-assistant"
+            aria-label="Assistant"
+            hidden={!assistantOpen}
+            className="max-h-[60vh] border-t border-stone-200 lg:max-h-none lg:w-96 lg:border-t-0 lg:border-l"
+          >
+            <AssistantPanel
+              onClose={() => {
+                setAssistantOpen(false);
+              }}
+            />
+          </aside>
         </div>
       </div>
     </EditorProvider>

@@ -50,6 +50,15 @@ export async function ensureSignedIn(): Promise<Account> {
   return toAccount(user);
 }
 
+/** A fresh Firebase ID token for calling the API, signing in as a guest if needed. */
+export async function idToken(): Promise<string> {
+  await ensureSignedIn();
+  const instance = await getAuthInstance();
+  const user = instance.currentUser;
+  if (!user) throw new Error("Not signed in");
+  return user.getIdToken();
+}
+
 /**
  * Signs in with Google. A guest's account is linked rather than replaced, so
  * their rooms carry over. If that Google account already exists, it signs in
