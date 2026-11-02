@@ -1,7 +1,9 @@
 """The instructions and context the language model receives."""
 
 import json
+from collections.abc import Sequence
 
+from roomcraft_api.assistant.plans import Attempt
 from roomcraft_api.domain.catalog import Catalog
 from roomcraft_api.domain.operations import layout_cost
 from roomcraft_api.schemas.operations import AssistRequest
@@ -34,13 +36,22 @@ Operations:
 - rotate: placement_id, rotation.
 - remove: placement_id.
 - material: any of floor (wood, tile, carpet), floor_color, wall_color as #rrggbb.
+Operations apply in order, so remove or move a piece before using its space.
 Use at most 12 operations per plan, and only the ones the request needs. Give every
-operation a one-sentence reason written to the person. Give each plan a short summary.
+operation a one-sentence reason written to the person. Give each plan a short summary
+that describes only the operations in that plan.
+
+earlier_plans, when present, holds plans you already gave and the operations the server
+refused in each, with the rule broken and any piece in the way (other_id). Answer with one
+new plan for each: keep what worked, change what was refused so that it follows the rules,
+and leave out what cannot fit.
 """
 
 
-def build_contents(request: AssistRequest, catalog: Catalog) -> str:
-    """The request, the room as it is, and the catalog, as compact JSON."""
+def build_contents(
+    request: AssistRequest, catalog: Catalog, earlier: Sequence[Attempt] = ()
+) -> str:
+    """The request, the room as it is, the catalog, and any earlier attempts, as compact JSON."""
     room = request.room
     furniture = [
         {
@@ -57,9 +68,9 @@ def build_contents(request: AssistRequest, catalog: Catalog) -> str:
         for placement in request.furniture
         if placement.item_id in catalog
     ]
-    context = {
+    context: dict[str, object] = {
         "request": request.prompt,
-        "plans_wanted": request.options,
+        "plans_wanted": len(earlier) or request.options,
         "room": {
             "type": room.type,
             "style": room.style,
@@ -88,4 +99,15 @@ def build_contents(request: AssistRequest, catalog: Catalog) -> str:
             for item in catalog.values()
         ],
     }
+    if earlier:
+        context["earlier_plans"] = [
+            {
+                "plan": attempt.plan.model_dump(exclude_none=True),
+                "refused": [
+                    refusal.model_dump(exclude_none=True, by_alias=False)
+                    for refusal in attempt.refused
+                ],
+            }
+            for attempt in earlier
+        ]
     return json.dumps(context, separators=(",", ":"))

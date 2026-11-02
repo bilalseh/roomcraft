@@ -1,9 +1,14 @@
 import json
 
-from roomcraft_api.assistant.plans import PlannedOperation, to_operation
+from roomcraft_api.assistant.plans import Attempt, Plan, PlannedOperation, to_operation
 from roomcraft_api.assistant.prompt import build_contents
 from roomcraft_api.domain.catalog import load_catalog
-from roomcraft_api.schemas.operations import AddOperation, AssistRequest, MaterialOperation
+from roomcraft_api.schemas.operations import (
+    AddOperation,
+    AssistRequest,
+    MaterialOperation,
+    RejectedOperation,
+)
 from tests.fixtures import SHARED, load_fixture
 
 CATALOG = load_catalog(SHARED / "catalog" / "catalog.json")
@@ -50,3 +55,28 @@ def test_the_prompt_carries_the_room_furniture_and_catalog() -> None:
     assert context["furniture"][0]["name"] == "Three-seat sofa"
     assert context["spent_at_lowest_prices"] == 699
     assert len(context["catalog"]) == len(CATALOG)
+    assert "earlier_plans" not in context
+
+
+def test_a_second_attempt_shows_the_model_what_was_refused() -> None:
+    request = AssistRequest.model_validate(
+        {
+            "prompt": "Make it feel bigger",
+            "room": FIXTURE["room"],
+            "furniture": FIXTURE["furniture"],
+            "materials": FIXTURE["materials"],
+            "options": 3,
+        }
+    )
+    planned = PlannedOperation(op="add", item_id="armchair", x=1, z=2, reason="Cosy.")
+    refused = RejectedOperation(op="add", reason="Cosy.", code="overlaps", other_id="sofa")
+    attempt = Attempt(Plan(summary="A chair.", operations=[planned]), [refused])
+
+    context = json.loads(build_contents(request, CATALOG, [attempt]))
+
+    assert context["plans_wanted"] == 1
+    [earlier] = context["earlier_plans"]
+    assert earlier["plan"]["operations"][0]["item_id"] == "armchair"
+    assert earlier["refused"] == [
+        {"op": "add", "reason": "Cosy.", "code": "overlaps", "other_id": "sofa"}
+    ]

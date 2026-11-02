@@ -80,11 +80,14 @@ The language model never edits a room. It returns a plan, and the plan has to ea
    door swings clear and stay within the budget. Rotations snap to 15°, wall pieces snap onto
    the nearest wall and cannot be turned away from it. Anything that fails is
    reported with a code (`overlaps`, `blocks_door`, `over_budget`, ...) and the piece involved.
-4. **Same rules on both sides.** The browser applies the accepted operations again with the
+4. **One more try.** A plan with refused operations goes back to the model once, with what was
+   refused and why. The new plan is checked the same way and replaces the first only if it is
+   better. If it is slow or fails, the first answer still stands.
+5. **Same rules on both sides.** The browser applies the accepted operations again with the
    TypeScript version of the same rules, against the room as it is now, before showing the
    preview. Both implementations run the same JSON fixtures (`shared/fixtures/*.json`) in their
    test suites, so they cannot drift apart silently.
-5. **People decide.** A suggestion is a preview until it is applied, and then it is one undo
+6. **People decide.** A suggestion is a preview until it is applied, and then it is one undo
    step.
 
 Requests need a Firebase ID token and are limited to 20 per person per day, counted in Firestore

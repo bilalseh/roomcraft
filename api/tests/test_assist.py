@@ -1,10 +1,11 @@
+from collections.abc import Sequence
 from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
 
 from roomcraft_api.assistant.model import AssistantFailedError, AssistantUnavailableError
-from roomcraft_api.assistant.plans import Plan, PlannedOperation, PlanResponse
+from roomcraft_api.assistant.plans import Attempt, Plan, PlannedOperation, PlanResponse
 from roomcraft_api.assistant.service import LayoutAssistant
 from roomcraft_api.dependencies import layout_assistant, rate_limiter, token_verifier
 from roomcraft_api.domain.catalog import load_catalog
@@ -32,7 +33,7 @@ class FakeModel:
         self.error = error
         self.requests: list[AssistRequest] = []
 
-    async def plan(self, request: AssistRequest) -> PlanResponse:
+    async def plan(self, request: AssistRequest, earlier: Sequence[Attempt] = ()) -> PlanResponse:
         self.requests.append(request)
         if self.error:
             raise self.error

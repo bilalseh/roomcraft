@@ -1,13 +1,14 @@
 """Language models that turn a request into plans."""
 
 import logging
+from collections.abc import Sequence
 from typing import Protocol
 
 from google import genai
 from google.genai import errors, types
 from pydantic import ValidationError
 
-from roomcraft_api.assistant.plans import PlanResponse, plan_response_schema
+from roomcraft_api.assistant.plans import Attempt, PlanResponse, plan_response_schema
 from roomcraft_api.assistant.prompt import SYSTEM_INSTRUCTION, build_contents
 from roomcraft_api.domain.catalog import Catalog
 from roomcraft_api.schemas.operations import AssistRequest
@@ -31,7 +32,9 @@ class AssistantFailedError(Exception):
 
 
 class LayoutModel(Protocol):
-    async def plan(self, request: AssistRequest) -> PlanResponse: ...
+    async def plan(
+        self, request: AssistRequest, earlier: Sequence[Attempt] = ()
+    ) -> PlanResponse: ...
 
 
 class GeminiLayoutModel:
@@ -50,8 +53,8 @@ class GeminiLayoutModel:
             thinking_config=types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW),
         )
 
-    async def plan(self, request: AssistRequest) -> PlanResponse:
-        contents = build_contents(request, self._catalog)
+    async def plan(self, request: AssistRequest, earlier: Sequence[Attempt] = ()) -> PlanResponse:
+        contents = build_contents(request, self._catalog, earlier)
         for model in self._models:
             try:
                 response = await self._client.aio.models.generate_content(

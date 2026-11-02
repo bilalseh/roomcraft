@@ -5,6 +5,7 @@ fields. The server then turns each one into a strict operation, and anything
 incomplete is reported back rather than trusted.
 """
 
+from dataclasses import dataclass
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, ValidationError
@@ -17,6 +18,7 @@ from roomcraft_api.schemas.operations import (
     MaterialOperation,
     MoveOperation,
     Operation,
+    RejectedOperation,
     RemoveOperation,
     RotateOperation,
 )
@@ -44,6 +46,14 @@ class Plan(BaseModel):
 
 class PlanResponse(BaseModel):
     plans: list[Plan] = Field(min_length=1, max_length=3)
+
+
+@dataclass(frozen=True, slots=True)
+class Attempt:
+    """A plan the server has checked, and the operations it refused."""
+
+    plan: Plan
+    refused: list[RejectedOperation]
 
 
 class _WithoutArrayLimits(GenerateJsonSchema):
