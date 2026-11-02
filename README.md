@@ -10,6 +10,8 @@ read-only link or a two-page PDF.
 **Try it:** https://roomcraft-planner.web.app (no account needed: "Try the demo" opens a
 furnished room) · **API docs:** https://roomcraft-api-929h.onrender.com/docs
 
+![The assistant swapping a coffee table for an ottoman: the removed table shows as a red ghost, new pieces are outlined in violet, and the change is applied and undone as one step](docs/media/assistant.gif)
+
 ## Features
 
 - **Room wizard.** Room type, size (metric or imperial), doors and windows on any wall, style

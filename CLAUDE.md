@@ -31,14 +31,18 @@ versions, share link for a signed-out visitor, My rooms). Google sign-in has not
 been exercised in a browser yet: it needs a real Google login. Firestore rules
 are deployed by hand: the CI service account cannot deploy rules. Rules tests
 run only in CI (local Java is 8).
-Phase 6: built. `POST /v1/assist` (Firebase ID token, 20 requests a day counted
-in Firestore, Gemini `gemini-3.8-flash` with `gemini-3.5-flash-lite` fallback,
-operations validated in order and shared with TS via
-`shared/fixtures/operations.json`). Web: assistant panel, 3D previews (violet =
-added or moved, red ghosts = removed), apply as one undo step, three-option mode
-with thumbnails. Answers 503 until Render has `ROOMCRAFT_GEMINI_API_KEY` and
-`GOOGLE_APPLICATION_CREDENTIALS` (secret file), so it has not run against the
-real model yet.
+Phase 6: done (verified 2026-11-02 on the live site against the real model: ask,
+preview, apply, undo, three layouts). `POST /v1/assist` (Firebase ID token, 20
+requests a day counted in Firestore, Gemini `gemini-3.8-flash` with
+`gemini-3.5-flash-lite` fallback, operations validated in order and shared with
+TS via `shared/fixtures/operations.json`). Web: assistant panel, 3D previews
+(violet = added or moved, red ghosts = removed), apply as one undo step,
+three-option mode with thumbnails. What the real model needed: no `maxItems` on
+nested arrays (generic 400, so `plan_response_schema()` leaves array limits to
+validating the answer), low thinking (medium took 167 s against the web client's
+90 s limit; low takes 7 to 12 s), no sampling parameters (deprecated from 3.6). At
+low thinking, plans often include pieces that validation refuses, so answers can
+list ideas left out and summaries can mention them.
 Phase 7: done. Budget meter (price range against the budget), shopping list
 grouped by category with CSV, two-page PDF (vector floor plan with measurements,
 3D snapshot, shopping list) built with jsPDF loaded on demand.
@@ -46,14 +50,11 @@ Phase 8: done. Phones get a read-only viewer; reduced motion turns off camera
 damping; skip link; first-visit onboarding tour (remembered in localStorage);
 axe-core tests on landing, wizard and editor (colour contrast checked by hand,
 jsdom cannot compute it).
-Current phase: **9** (README, screenshots, GIF, final deploy). README, screenshots
-in `docs/media/` and the Playwright happy path (`e2e/`, `pnpm test:e2e`, Auth +
-Firestore emulators, web built with `--mode e2e`) are in. The e2e test runs fully
-only in CI (Firestore emulator needs Java 21); locally the wizard half passes
-against the Auth emulator alone. Docker Desktop is installed but has no WSL
-distro, so it does not start. Left: once the Gemini key is on Render, check the
-assistant against the real model, record `docs/media/assistant.gif` and link it at
-the top of the README.
+Phase 9: done. README, screenshots and the assistant GIF in `docs/media/`, and the
+Playwright happy path (`e2e/`, `pnpm test:e2e`, Auth + Firestore emulators, web
+built with `--mode e2e`). The e2e test runs fully only in CI (Firestore emulator
+needs Java 21); locally the wizard half passes against the Auth emulator alone.
+Docker Desktop is installed but has no WSL distro, so it does not start.
 
 ### Phase 1 plan (agreed)
 
@@ -102,6 +103,12 @@ and the shell footer shows the API `/health` status.
   secrets: it is public, and committing the Firebase API key would trip
   GitHub secret scanning.
 - Share links are published snapshots, not live views.
+- Gemini is paid, not free tier: the terms require paid use for apps open to the
+  EEA, Switzerland and the UK. The key on Render belongs to an AI Studio project
+  on the prepaid "My Billing Account" ($5 bought 2026-11-02, auto-reload off).
+  With no credits Gemini answers 402 and the assistant says "unavailable".
+- Never set up billing on `roomcraft-planner` (AI Studio offers it): that would
+  move Firebase from Spark to pay-as-you-go Blaze.
 - See "Storage on the free plan" and "Backend on free hosting" in the spec.
 
 ## Tooling
@@ -133,5 +140,5 @@ and the shell footer shows the API `/health` status.
       `github-action-1441323664`; the CLI also granted Auth Admin and Functions
       Developer, which can be trimmed to least privilege)
 - [x] Enable Google and Anonymous sign-in
-- [ ] Gemini API key from Google AI Studio as a Render env var, plus the
+- [x] Gemini API key from Google AI Studio as a Render env var, plus the
       `roomcraft-api` service account as a secret file (phase 6)
