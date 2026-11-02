@@ -10,8 +10,6 @@ read-only link or a two-page PDF.
 **Try it:** https://roomcraft-planner.web.app (no account needed: "Try the demo" opens a
 furnished room) · **API docs:** https://roomcraft-api-929h.onrender.com/docs
 
-![The assistant rearranging a living room: suggested pieces appear in violet, removed ones as red ghosts, and the change is applied as one undo step](docs/media/assistant.gif)
-
 ## Features
 
 - **Room wizard.** Room type, size (metric or imperial), doors and windows on any wall, style

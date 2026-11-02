@@ -26,35 +26,34 @@ wall paint and per-piece finishes (all undoable); day/night with lamps as
 point lights; orbit, top-down plan with measurements, and first-person walk;
 clearance warnings (door swing, walkways under 80 cm via grid reachability)
 shared with Python via `shared/fixtures/clearance.json`.
-Phase 5: built and committed locally, not pushed. Firestore rules are deployed
-(by hand: the CI service account cannot deploy rules). Blocked on the user
-enabling Firebase Authentication (anonymous sign-in returns
-CONFIGURATION_NOT_FOUND). After that: browser-check /demo, autosave, versions,
-share link and My rooms against the real project, then push.
-Rules tests run only in CI (local Java is 8).
-Phase 6: built and committed locally, not pushed. `POST /v1/assist` (Firebase
-ID token, 20 requests a day counted in Firestore, Gemini `gemini-3.8-flash`
-with `gemini-3.5-flash-lite` fallback, operations validated in order and
-shared with TS via `shared/fixtures/operations.json`). Web: assistant panel,
-3D previews (violet = added or moved, red ghosts = removed), apply as one undo
-step, three-option mode with thumbnails. Answers 503 until Render has
-`ROOMCRAFT_GEMINI_API_KEY` and `GOOGLE_APPLICATION_CREDENTIALS` (secret file).
-Phase 7: built and committed locally, not pushed. Budget meter (price range
-against the budget), shopping list grouped by category with CSV, two-page PDF
-(vector floor plan with measurements, 3D snapshot, shopping list) built with
-jsPDF loaded on demand.
-Phase 8: built and committed locally, not pushed. Phones get a read-only
-viewer; reduced motion turns off camera damping; skip link; first-visit
-onboarding tour (remembered in localStorage); axe-core tests on landing,
-wizard and editor (colour contrast checked by hand, jsdom cannot compute it).
-Current phase: **9** (README, screenshots, GIF, final deploy). README and the
-Playwright happy path (`e2e/`, `pnpm test:e2e`, Auth + Firestore emulators,
-web built with `--mode e2e`) are committed locally. The e2e test runs fully
+Phase 5: done (verified 2026-11-02 against the real project: /demo, autosave,
+versions, share link for a signed-out visitor, My rooms). Google sign-in has not
+been exercised in a browser yet: it needs a real Google login. Firestore rules
+are deployed by hand: the CI service account cannot deploy rules. Rules tests
+run only in CI (local Java is 8).
+Phase 6: built. `POST /v1/assist` (Firebase ID token, 20 requests a day counted
+in Firestore, Gemini `gemini-3.8-flash` with `gemini-3.5-flash-lite` fallback,
+operations validated in order and shared with TS via
+`shared/fixtures/operations.json`). Web: assistant panel, 3D previews (violet =
+added or moved, red ghosts = removed), apply as one undo step, three-option mode
+with thumbnails. Answers 503 until Render has `ROOMCRAFT_GEMINI_API_KEY` and
+`GOOGLE_APPLICATION_CREDENTIALS` (secret file), so it has not run against the
+real model yet.
+Phase 7: done. Budget meter (price range against the budget), shopping list
+grouped by category with CSV, two-page PDF (vector floor plan with measurements,
+3D snapshot, shopping list) built with jsPDF loaded on demand.
+Phase 8: done. Phones get a read-only viewer; reduced motion turns off camera
+damping; skip link; first-visit onboarding tour (remembered in localStorage);
+axe-core tests on landing, wizard and editor (colour contrast checked by hand,
+jsdom cannot compute it).
+Current phase: **9** (README, screenshots, GIF, final deploy). README, screenshots
+in `docs/media/` and the Playwright happy path (`e2e/`, `pnpm test:e2e`, Auth +
+Firestore emulators, web built with `--mode e2e`) are in. The e2e test runs fully
 only in CI (Firestore emulator needs Java 21); locally the wizard half passes
 against the Auth emulator alone. Docker Desktop is installed but has no WSL
-distro, so it does not start. Before pushing, capture the images the README
-links: `docs/media/assistant.gif` (needs the Gemini key), `editor.png`,
-`plan.png` (need Authentication).
+distro, so it does not start. Left: once the Gemini key is on Render, check the
+assistant against the real model, record `docs/media/assistant.gif` and link it at
+the top of the README.
 
 ### Phase 1 plan (agreed)
 
@@ -125,7 +124,7 @@ and the shell footer shows the API `/health` status.
 
 ## Pending manual steps
 
-- [ ] Create the Firestore database in the console (`nam5`, production mode)
+- [x] Create the Firestore database in the console (`nam5`, production mode)
 - [x] Hugging Face account + `HF_TOKEN` GitHub secret (username `BilalSeh`);
       unused since the move to Render, can be deleted
 - [x] Render account (sign in with GitHub) and a Blueprint from `render.yaml`
@@ -133,5 +132,6 @@ and the shell footer shows the API `/health` status.
       for GitHub Actions, via `firebase init hosting:github` (service account
       `github-action-1441323664`; the CLI also granted Auth Admin and Functions
       Developer, which can be trimmed to least privilege)
-- [ ] Enable Google and Anonymous sign-in (before phase 5)
-- [ ] Gemini API key from Google AI Studio as a Render env var (phase 6)
+- [x] Enable Google and Anonymous sign-in
+- [ ] Gemini API key from Google AI Studio as a Render env var, plus the
+      `roomcraft-api` service account as a secret file (phase 6)

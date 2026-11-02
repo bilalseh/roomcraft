@@ -38,7 +38,7 @@ export function RoomScene() {
         position={[span * 0.6, span * 2, span * 0.9]}
         color={night ? "#9fb4d8" : "#ffffff"}
         intensity={light.sun}
-        castShadow={!night}
+        castShadow={!night && mode !== "plan"}
         shadow-mapSize={[2048, 2048]}
         shadow-bias={-0.0004}
         shadow-camera-left={-span}
