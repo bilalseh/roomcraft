@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from roomcraft_api.assistant.model import AssistantFailedError
+from roomcraft_api.assistant.model import AssistantFailedError, AssistantUnavailableError
 from roomcraft_api.assistant.plans import Plan, PlannedOperation, PlanResponse
 from roomcraft_api.assistant.service import LayoutAssistant
 from roomcraft_api.dependencies import layout_assistant, rate_limiter, token_verifier
@@ -27,15 +27,15 @@ class FakeVerifier:
 
 
 class FakeModel:
-    def __init__(self, plans: list[Plan] | None = None, fail: bool = False) -> None:
+    def __init__(self, plans: list[Plan] | None = None, error: Exception | None = None) -> None:
         self.plans = plans or []
-        self.fail = fail
+        self.error = error
         self.requests: list[AssistRequest] = []
 
     async def plan(self, request: AssistRequest) -> PlanResponse:
         self.requests.append(request)
-        if self.fail:
-            raise AssistantFailedError
+        if self.error:
+            raise self.error
         return PlanResponse(plans=self.plans)
 
 
@@ -123,8 +123,12 @@ def test_limits_requests_per_person_per_day() -> None:
 
 @pytest.mark.parametrize(
     ("model", "status"),
-    [(None, 503), (FakeModel(fail=True), 502)],
-    ids=["not configured", "unusable answer"],
+    [
+        (None, 503),
+        (FakeModel(error=AssistantUnavailableError()), 503),
+        (FakeModel(error=AssistantFailedError()), 502),
+    ],
+    ids=["not configured", "refused by the model service", "unusable answer"],
 )
 def test_reports_when_the_assistant_cannot_help(model: FakeModel | None, status: int) -> None:
     client = make_client(model)

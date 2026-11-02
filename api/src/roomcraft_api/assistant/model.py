@@ -1,5 +1,6 @@
 """Language models that turn a request into plans."""
 
+import logging
 from typing import Protocol
 
 from google import genai
@@ -11,13 +12,22 @@ from roomcraft_api.assistant.prompt import SYSTEM_INSTRUCTION, build_contents
 from roomcraft_api.domain.catalog import Catalog
 from roomcraft_api.schemas.operations import AssistRequest
 
+logger = logging.getLogger(__name__)
+
+# Over quota or retired. Server errors also move on to the next model.
+_TRY_NEXT_MODEL = frozenset({404, 429})
+
 
 class AssistantBusyError(Exception):
-    """Every model is over its quota for now."""
+    """No model can answer for now: over quota, overloaded or retired."""
+
+
+class AssistantUnavailableError(Exception):
+    """The model service refused the request, which points at the setup, not the wording."""
 
 
 class AssistantFailedError(Exception):
-    """The model could not be reached, or answered with something unusable."""
+    """The model answered with something unusable."""
 
 
 class LayoutModel(Protocol):
@@ -25,8 +35,8 @@ class LayoutModel(Protocol):
 
 
 class GeminiLayoutModel:
-    """Gemini, with its JSON output constrained to `PlanResponse`. When one model is over
-    its quota, the next one is tried."""
+    """Gemini, with its JSON output constrained to `PlanResponse`. When one model cannot
+    answer for now, the next one is tried."""
 
     def __init__(self, api_key: str, models: tuple[str, ...], catalog: Catalog) -> None:
         self._client = genai.Client(api_key=api_key)
@@ -47,11 +57,25 @@ class GeminiLayoutModel:
                     model=model, contents=contents, config=self._config
                 )
             except errors.APIError as error:
-                if error.code == 429:
+                logger.warning(
+                    "Gemini %s refused: %s %s: %s", model, error.code, error.status, error.message
+                )
+                if error.code in _TRY_NEXT_MODEL or error.code >= 500:
                     continue
-                raise AssistantFailedError(str(error)) from error
+                raise AssistantUnavailableError from error
             try:
                 return PlanResponse.model_validate_json(response.text or "")
             except ValidationError as error:
-                raise AssistantFailedError("Unusable answer") from error
+                logger.warning(
+                    "Gemini %s gave an unusable answer (%s): %s",
+                    model,
+                    _finish_reason(response),
+                    error.errors(include_url=False, include_input=False),
+                )
+                raise AssistantFailedError from error
         raise AssistantBusyError
+
+
+def _finish_reason(response: types.GenerateContentResponse) -> str:
+    candidates = response.candidates or []
+    return str(candidates[0].finish_reason) if candidates else "no candidates"

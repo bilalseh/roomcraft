@@ -4,7 +4,11 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from roomcraft_api.assistant.model import AssistantBusyError, AssistantFailedError
+from roomcraft_api.assistant.model import (
+    AssistantBusyError,
+    AssistantFailedError,
+    AssistantUnavailableError,
+)
 from roomcraft_api.assistant.service import LayoutAssistant
 from roomcraft_api.dependencies import current_uid, layout_assistant, rate_limiter
 from roomcraft_api.schemas.operations import AssistRequest, AssistResponse
@@ -17,7 +21,9 @@ _ERRORS: dict[int | str, dict[str, Any]] = {
     status.HTTP_401_UNAUTHORIZED: {"description": "Missing or invalid Firebase ID token."},
     status.HTTP_429_TOO_MANY_REQUESTS: {"description": "Daily assistant requests used up."},
     status.HTTP_502_BAD_GATEWAY: {"description": "The model's answer was unusable."},
-    status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Not configured, or the model is busy."},
+    status.HTTP_503_SERVICE_UNAVAILABLE: {
+        "description": "Not configured, refused by the model service, or the model is busy."
+    },
 }
 
 
@@ -45,6 +51,11 @@ async def assist(
     except AssistantBusyError as error:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "The assistant is busy. Try again in a minute."
+        ) from error
+    except AssistantUnavailableError as error:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "The assistant is unavailable right now. Please try again later.",
         ) from error
     except AssistantFailedError as error:
         raise HTTPException(
