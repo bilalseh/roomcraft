@@ -1,9 +1,12 @@
 import type { Suggestion } from "@roomcraft/shared";
+import type { Layout } from "../../domain/layout";
 import { useEditor } from "../state/useEditor";
 import { describeOperation, explainRejection, pieceNames } from "./describe";
 
 interface SuggestionCardProps {
   suggestion: Suggestion;
+  /** The room the suggestion was made for, which still names pieces it has since removed. */
+  layout: Layout;
   /** "Option 2" when the assistant offered several layouts. */
   label?: string | undefined;
   thumbnail?: string | null | undefined;
@@ -13,8 +16,7 @@ interface SuggestionCardProps {
 
 /** One suggested layout: what it does and why, with preview, apply and discard. */
 export function SuggestionCard(props: SuggestionCardProps) {
-  const { suggestion, label, thumbnail, previewing, onPreview } = props;
-  const layout = useEditor((state) => state.history.present);
+  const { suggestion, layout, label, thumbnail, previewing, onPreview } = props;
   const accept = useEditor((state) => state.acceptPreview);
   const discard = useEditor((state) => state.discardPreview);
   const names = pieceNames(layout, suggestion.operations);

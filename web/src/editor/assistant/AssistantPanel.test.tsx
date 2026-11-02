@@ -80,6 +80,37 @@ describe("AssistantPanel", () => {
     expect(roomTab()).toHaveTextContent("In room (11)");
   });
 
+  it("still names a piece after removing it", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(Response.json({ status: "ok", version: "1" }))),
+    );
+    setAssistantReply({
+      suggestions: [
+        {
+          summary: "More floor.",
+          operations: [{ op: "remove", placementId: "coffee-table", reason: "More room." }],
+          rejected: [],
+        },
+      ],
+      remainingToday: 19,
+    });
+    const user = renderEditor();
+    await openAssistant(user);
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Ask the assistant" }),
+      "More floor{Enter}",
+    );
+    expect(await screen.findByText("Remove the coffee table")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Preview in 3D" }));
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+
+    expect(roomTab()).toHaveTextContent("In room (10)");
+    expect(screen.getByText("Remove the coffee table")).toBeInTheDocument();
+  });
+
   it("explains changes the server left out", async () => {
     vi.stubGlobal(
       "fetch",

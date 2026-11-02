@@ -2,6 +2,7 @@ import type { Suggestion } from "@roomcraft/shared";
 import { useRef, useState } from "react";
 import { useApiHealth } from "../../app/useApiHealth";
 import { AssistantError, askAssistant } from "../../data/assistant";
+import type { Layout } from "../../domain/layout";
 import { applyOperations } from "../../domain/operations";
 import { useEditor, useEditorStore } from "../state/useEditor";
 import { SuggestionCard } from "./SuggestionCard";
@@ -15,6 +16,7 @@ const EXAMPLES = [
 interface Exchange {
   id: number;
   prompt: string;
+  layout: Layout;
   status: "pending" | "done" | "error";
   suggestions: Suggestion[];
   thumbnails: (string | null)[];
@@ -71,12 +73,13 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   const ask = async (text: string) => {
     const id = nextId.current++;
     const options = layouts;
+    const layout = store.getState().history.present;
     setPrompt("");
     setExchanges((list) => [
       ...list,
-      { id, prompt: text, status: "pending", suggestions: [], thumbnails: [] },
+      { id, prompt: text, layout, status: "pending", suggestions: [], thumbnails: [] },
     ]);
-    const { room, furniture, materials } = store.getState().history.present;
+    const { room, furniture, materials } = layout;
     try {
       const response = await askAssistant({ prompt: text, room, furniture, materials, options });
       setRemaining(response.remainingToday);
@@ -162,6 +165,7 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
               <SuggestionCard
                 key={index}
                 suggestion={suggestion}
+                layout={exchange.layout}
                 label={exchange.suggestions.length > 1 ? `Option ${index + 1}` : undefined}
                 thumbnail={exchange.thumbnails[index]}
                 previewing={previewing?.exchange === exchange.id && previewing.index === index}

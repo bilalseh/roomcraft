@@ -90,9 +90,14 @@ export async function askAssistant(request: AssistRequest): Promise<AssistRespon
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (error) {
-    throw new AssistantError("The assistant could not be reached. Check your connection.", null, {
-      cause: error,
-    });
+    const timedOut = error instanceof DOMException && error.name === "TimeoutError";
+    throw new AssistantError(
+      timedOut
+        ? "The assistant took too long to answer. Please try again."
+        : "The assistant could not be reached. Check your connection.",
+      null,
+      { cause: error },
+    );
   }
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
