@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 from google import genai
-from google.genai import errors
+from google.genai import errors, types
 
 from roomcraft_api.assistant.model import (
     AssistantBusyError,
@@ -32,9 +32,13 @@ class FakeModels:
     def __init__(self, outcomes: list[errors.APIError | str | None]) -> None:
         self.outcomes = outcomes
         self.called: list[str] = []
+        self.configs: list[types.GenerateContentConfig] = []
 
-    async def generate_content(self, *, model: str, **_: Any) -> SimpleNamespace:
+    async def generate_content(
+        self, *, model: str, config: types.GenerateContentConfig, **_: Any
+    ) -> SimpleNamespace:
         self.called.append(model)
+        self.configs.append(config)
         outcome = self.outcomes.pop(0)
         if isinstance(outcome, errors.APIError):
             raise outcome
@@ -74,6 +78,16 @@ def test_tries_the_next_model_when_one_cannot_answer(
 
     assert run(monkeypatch, fake) == "Cosier."
     assert fake.called == ["primary", "fallback"]
+
+
+def test_sends_no_sampling_parameters(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Gemini 3.6 and later deprecate them, and Google warns they will become 400 errors."""
+    fake = FakeModels([ANSWER])
+
+    run(monkeypatch, fake)
+
+    [config] = fake.configs
+    assert (config.temperature, config.top_p, config.top_k) == (None, None, None)
 
 
 def test_is_busy_when_no_model_can_answer(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -46,7 +46,6 @@ class GeminiLayoutModel:
             system_instruction=SYSTEM_INSTRUCTION,
             response_mime_type="application/json",
             response_json_schema=PlanResponse.model_json_schema(),
-            temperature=0.8,
         )
 
     async def plan(self, request: AssistRequest) -> PlanResponse:
