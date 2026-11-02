@@ -95,6 +95,16 @@ def test_sends_no_sampling_parameters(monkeypatch: pytest.MonkeyPatch) -> None:
     assert (config.temperature, config.top_p, config.top_k) == (None, None, None)
 
 
+def test_thinks_at_a_low_level_to_answer_in_time(monkeypatch: pytest.MonkeyPatch) -> None:
+    fake = FakeModels([ANSWER])
+
+    run(monkeypatch, fake)
+
+    [config] = fake.configs
+    assert config.thinking_config is not None
+    assert config.thinking_config.thinking_level == types.ThinkingLevel.LOW
+
+
 def test_keeps_array_limits_out_of_the_schema(monkeypatch: pytest.MonkeyPatch) -> None:
     fake = FakeModels([ANSWER])
 

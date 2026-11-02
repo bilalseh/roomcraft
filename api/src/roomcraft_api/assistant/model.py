@@ -46,6 +46,8 @@ class GeminiLayoutModel:
             system_instruction=SYSTEM_INSTRUCTION,
             response_mime_type="application/json",
             response_json_schema=plan_response_schema(),
+            # The default, medium, took 167 seconds to plan a small room.
+            thinking_config=types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW),
         )
 
     async def plan(self, request: AssistRequest) -> PlanResponse:
