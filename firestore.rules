@@ -1,11 +1,69 @@
 rules_version = '2';
 
-// Deny everything until the project data model is defined. The API uses the
-// Admin SDK, which bypasses these rules.
+// Each person reads and writes only their own projects, versions and
+// thumbnails. Shared plans are published snapshots: anyone with the link can
+// read one, only its owner can change or remove it, and nobody can list them.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownedBy(data) {
+      return signedIn() && data.ownerId == request.auth.uid;
+    }
+
+    // Writes keep the same owner, and only the owner can make them.
+    function ownerWrite() {
+      return ownedBy(request.resource.data)
+        && (resource == null || ownedBy(resource.data));
+    }
+
+    function layoutFields(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 80
+        && data.room is map
+        && data.furniture is list && data.furniture.size() <= 200
+        && data.materials is map;
+    }
+
+    match /projects/{projectId} {
+      allow get, delete: if ownedBy(resource.data);
+      allow list: if ownedBy(resource.data);
+      allow create, update: if ownerWrite()
+        && request.resource.data.keys().hasOnly(
+          ['ownerId', 'name', 'room', 'furniture', 'materials', 'createdAt', 'updatedAt', 'shareId'])
+        && layoutFields(request.resource.data);
+
+      match /versions/{versionId} {
+        function projectOwner() {
+          return signedIn()
+            && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
+        }
+        allow read, delete: if projectOwner();
+        allow create: if projectOwner()
+          && request.resource.data.keys().hasOnly(['name', 'room', 'furniture', 'materials', 'createdAt'])
+          && layoutFields(request.resource.data);
+      }
+    }
+
+    match /thumbnails/{thumbnailId} {
+      allow get: if ownedBy(resource.data);
+      // Deleting a project also deletes thumbnails that may never have been made.
+      allow delete: if resource == null || ownedBy(resource.data);
+      allow create, update: if ownerWrite()
+        && request.resource.data.keys().hasOnly(['ownerId', 'image', 'updatedAt'])
+        && request.resource.data.image is string
+        && request.resource.data.image.size() < 120000;
+    }
+
+    match /shares/{shareId} {
+      allow get: if true;
+      allow list: if false;
+      allow delete: if ownedBy(resource.data);
+      allow create, update: if ownerWrite()
+        && request.resource.data.keys().hasOnly(
+          ['ownerId', 'projectId', 'name', 'room', 'furniture', 'materials', 'publishedAt'])
+        && layoutFields(request.resource.data);
     }
   }
 }

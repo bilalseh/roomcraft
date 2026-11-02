@@ -1,12 +1,13 @@
 import { data, type LoaderFunctionArgs } from "react-router";
-import type { Project } from "../domain/project";
-import { DEMO_PROJECT_ID, demoProject } from "../project/demoProject";
-import { loadProject } from "../project/localProjects";
+import { currentAccount } from "../data/auth";
+import { getProject } from "../data/projects";
 
 // Kept apart from the editor component, so finding the project never waits for three.js.
-export function editorLoader({ params }: LoaderFunctionArgs): Project {
-  const id = params.projectId ?? "";
-  const project = id === DEMO_PROJECT_ID ? demoProject() : loadProject(id);
-  if (!project) throw data("Project not found", { status: 404 });
-  return project;
+export async function editorLoader({ params }: LoaderFunctionArgs) {
+  const account = await currentAccount();
+  if (!account) throw data("Sign in to open this room", { status: 401 });
+  // Someone else's project reads as missing, so ids reveal nothing.
+  const stored = await getProject(params.projectId ?? "");
+  if (!stored) throw data("Project not found", { status: 404 });
+  return { ...stored, ownerId: account.uid };
 }

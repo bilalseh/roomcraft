@@ -97,6 +97,24 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm schema:check
 
+  rules:
+    name: Firestore rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      # The Firestore emulator needs a recent JDK.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:rules
+
   preview-web:
     name: Deploy web preview
     # Fork PRs have no access to the deploy secret.
@@ -123,7 +141,7 @@ jobs:
   deploy-web:
     name: Deploy web
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [web, api, schema]
+    needs: [web, api, schema, rules]
     runs-on: ubuntu-latest
     environment:
       name: web

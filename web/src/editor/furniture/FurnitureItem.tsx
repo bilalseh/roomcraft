@@ -36,7 +36,7 @@ export const FurnitureItem = memo(function FurnitureItem({
   const store = useEditorStore();
   const drag = useEditor((state) => (state.drag?.id === placement.id ? state.drag : null));
   const selected = useEditor((state) => state.selectedId === placement.id);
-  const editable = useEditor((state) => state.cameraMode !== "walk");
+  const editable = useEditor((state) => !state.readOnly && state.cameraMode !== "walk");
   const controls = useThree((state) => state.controls);
   const grab = useRef<{ dx: number; dz: number } | null>(null);
   const hit = useMemo(() => new Vector3(), []);

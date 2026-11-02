@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider, useParams } from "react-router";
 import { beforeEach, describe, expect, it } from "vitest";
 import { usePreferences } from "../app/preferences";
-import { loadProject } from "../project/localProjects";
+import { GUEST, savedProject } from "../test/fakeBackend";
 import { NewProjectWizard } from "./NewProjectWizard";
 
 function EditorStub() {
@@ -32,7 +32,6 @@ async function replace(user: ReturnType<typeof userEvent.setup>, field: HTMLElem
 
 describe("NewProjectWizard", () => {
   beforeEach(() => {
-    localStorage.clear();
     usePreferences.setState({ units: "metric" });
   });
 
@@ -64,11 +63,15 @@ describe("NewProjectWizard", () => {
     expect(screen.getByRole("textbox", { name: "Room name" })).toHaveValue("Bedroom");
     await user.click(screen.getByRole("button", { name: "Create room" }));
 
+    expect(await screen.findByText(/Editor for/)).toBeInTheDocument();
     const id = router.state.location.pathname.replace("/p/", "");
-    expect(screen.getByText(`Editor for ${id}`)).toBeInTheDocument();
-    expect(loadProject(id)).toMatchObject({
-      name: "Bedroom",
-      room: { type: "bedroom", width: 5, depth: 3.6, style: "scandinavian", budget: 2500 },
+    // Nobody was signed in, so the room belongs to a new guest account.
+    expect(savedProject(id)).toMatchObject({
+      ownerId: GUEST.uid,
+      project: {
+        name: "Bedroom",
+        room: { type: "bedroom", width: 5, depth: 3.6, style: "scandinavian", budget: 2500 },
+      },
     });
   });
 

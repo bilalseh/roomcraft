@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { usePreferences } from "../app/preferences";
-import { createProject } from "../domain/project";
+import { createProject, type Project } from "../domain/project";
 import { demoProject } from "../project/demoProject";
-import { loadProject, saveProject } from "../project/localProjects";
+import { ALEX, savedProject, seedProject, signInAs } from "../test/fakeBackend";
 import { EditorError } from "./EditorError";
 import { EditorRoute } from "./EditorRoute";
 import { editorLoader } from "./loadProject";
@@ -29,28 +29,37 @@ function renderEditor(path: string) {
   return userEvent.setup();
 }
 
+/** Alex's copy of the furnished demo room. */
+function seedDemo(): Project {
+  const project = { ...demoProject(), id: "room-1" };
+  seedProject(project, ALEX.uid);
+  return project;
+}
+
 const roomTab = () => screen.getByRole("tab", { name: /In room/ });
+const heading = (name: string) => screen.findByRole("heading", { name });
 
 describe("EditorRoute", () => {
   beforeEach(() => {
-    localStorage.clear();
     usePreferences.setState({ units: "metric" });
+    signInAs(ALEX);
   });
 
-  it("opens the furnished demo room", async () => {
-    renderEditor("/p/demo");
+  it("opens a furnished room", async () => {
+    seedDemo();
+    renderEditor("/p/room-1");
 
-    expect(await screen.findByRole("heading", { name: /Sunny living room/ })).toBeInTheDocument();
+    expect(await heading("Sunny living room")).toBeInTheDocument();
     expect(
       screen.getByText("Living room · 5.2 × 4.2 m · Scandinavian · Budget $4,000"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Demo: changes are not saved")).toBeInTheDocument();
     expect(roomTab()).toHaveTextContent("In room (11)");
   });
 
   it("adds furniture from the catalog, and undoes and redoes it", async () => {
-    const user = renderEditor("/p/demo");
-    await screen.findByRole("heading", { name: /Sunny living room/ });
+    seedDemo();
+    const user = renderEditor("/p/room-1");
+    await heading("Sunny living room");
 
     await user.click(screen.getByRole("button", { name: "Add ottoman" }));
     expect(roomTab()).toHaveTextContent("In room (12)");
@@ -64,8 +73,9 @@ describe("EditorRoute", () => {
   });
 
   it("selects furniture from the list and removes it with the keyboard", async () => {
-    const user = renderEditor("/p/demo");
-    await screen.findByRole("heading", { name: /Sunny living room/ });
+    seedDemo();
+    const user = renderEditor("/p/room-1");
+    await heading("Sunny living room");
 
     await user.click(roomTab());
     await user.click(screen.getByRole("button", { name: "Armchair" }));
@@ -79,22 +89,25 @@ describe("EditorRoute", () => {
     expect(screen.getByRole("button", { name: "Armchair" })).toBeInTheDocument();
   });
 
-  it("saves changes to a project in this browser", async () => {
-    const { room } = demoProject();
-    saveProject(createProject("abc", "My office", { ...room, type: "office" }, new Date()));
-    const user = renderEditor("/p/abc");
-    await screen.findByRole("heading", { name: "My office" });
+  it("saves changes and says when it last saved", async () => {
+    const room = { ...demoProject().room, type: "office" as const };
+    seedProject(createProject("office", "My office", room, new Date()), ALEX.uid);
+    const user = renderEditor("/p/office");
+    await heading("My office");
 
     await user.click(screen.getByRole("button", { name: "Add desk" }));
 
     await waitFor(() => {
-      expect(loadProject("abc")?.furniture.map((placement) => placement.itemId)).toEqual(["desk"]);
+      const furniture = savedProject("office")?.project.furniture ?? [];
+      expect(furniture.map((placement) => placement.itemId)).toEqual(["desk"]);
     });
+    expect(screen.getByText("Saved just now")).toBeInTheDocument();
   });
 
   it("changes the floor in the Finishes tab, as an undoable step", async () => {
-    const user = renderEditor("/p/demo");
-    await screen.findByRole("heading", { name: /Sunny living room/ });
+    seedDemo();
+    const user = renderEditor("/p/room-1");
+    await heading("Sunny living room");
 
     await user.click(screen.getByRole("tab", { name: "Finishes" }));
     await user.click(screen.getByRole("radio", { name: "Carpet" }));
@@ -105,13 +118,12 @@ describe("EditorRoute", () => {
   });
 
   it("warns about a blocked door and selects the piece in the way", async () => {
-    const { room } = demoProject();
-    const project = createProject("blocked", "Blocked door", room, new Date());
+    const project = createProject("blocked", "Blocked door", demoProject().room, new Date());
     // The demo door is on the south wall, 0.6 m from the corner; this chair stands in its swing.
-    project.furniture = [{ id: "chair", itemId: "armchair", x: 1.2, z: 3.6, rotation: 0 }];
-    saveProject(project);
+    const chair = { id: "chair", itemId: "armchair", x: 1.2, z: 3.6, rotation: 0 };
+    seedProject({ ...project, furniture: [chair] }, ALEX.uid);
     const user = renderEditor("/p/blocked");
-    await screen.findByRole("heading", { name: "Blocked door" });
+    await heading("Blocked door");
 
     await user.click(screen.getByRole("button", { name: "1 layout warning" }));
     await user.click(
@@ -123,21 +135,57 @@ describe("EditorRoute", () => {
     );
   });
 
-  it("explains when a room cannot be found", async () => {
-    renderEditor("/p/missing");
+  it("saves a version and restores it as an undoable step", async () => {
+    seedDemo();
+    const user = renderEditor("/p/room-1");
+    await heading("Sunny living room");
 
-    expect(
-      await screen.findByRole("heading", { name: "We couldn't find that room" }),
-    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Versions" }));
+    await user.type(screen.getByRole("textbox", { name: "Version name" }), "Before the move");
+    await user.click(screen.getByRole("button", { name: "Save version" }));
+    expect(await screen.findByText("Before the move")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Close" }));
+
+    await user.click(screen.getByRole("button", { name: "Add ottoman" }));
+    expect(roomTab()).toHaveTextContent("In room (12)");
+    await user.click(screen.getByRole("button", { name: "Versions" }));
+    await user.click(await screen.findByRole("button", { name: "Restore Before the move" }));
+
+    expect(roomTab()).toHaveTextContent("In room (11)");
+    await user.click(screen.getByRole("button", { name: "Undo" }));
+    expect(roomTab()).toHaveTextContent("In room (12)");
   });
 
-  it("treats unreadable saved data as missing", async () => {
-    localStorage.setItem("roomcraft:project:broken", "{not json");
+  it("publishes a share link and stops sharing", async () => {
+    seedDemo();
+    const user = renderEditor("/p/room-1");
+    await heading("Sunny living room");
 
-    renderEditor("/p/broken");
+    await user.click(screen.getByRole("button", { name: "Share" }));
+    await user.click(screen.getByRole("button", { name: "Create a share link" }));
 
-    expect(
-      await screen.findByRole("heading", { name: "We couldn't find that room" }),
-    ).toBeInTheDocument();
+    const link = await screen.findByRole("textbox", { name: "Share link" });
+    expect(link).toHaveValue(`${window.location.origin}/s/share-1`);
+    expect(savedProject("room-1")?.shareId).toBe("share-1");
+
+    await user.click(screen.getByRole("button", { name: "Stop sharing" }));
+    expect(await screen.findByRole("button", { name: "Create a share link" })).toBeInTheDocument();
+  });
+
+  it("asks people who are signed out to sign in", async () => {
+    seedDemo();
+    signInAs(null);
+
+    renderEditor("/p/room-1");
+
+    expect(await heading("Sign in to open this room")).toBeInTheDocument();
+  });
+
+  it("treats someone else's room as missing", async () => {
+    seedProject({ ...demoProject(), id: "theirs" }, "someone-else");
+
+    renderEditor("/p/theirs");
+
+    expect(await heading("We couldn't find that room")).toBeInTheDocument();
   });
 });

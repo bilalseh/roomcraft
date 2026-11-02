@@ -8,7 +8,7 @@ function storeWith(furniture: Placement[]) {
   const { room } = demoProject();
   const project = { ...createProject("p1", "Test", room, new Date()), furniture };
   let next = 0;
-  return createEditorStore(project, () => `new-${String(++next)}`);
+  return createEditorStore(project, { newId: () => `new-${String(++next)}` });
 }
 
 const sofa: Placement = { id: "sofa", itemId: "sofa-three-seat", x: 2.6, z: 2.1, rotation: 0 };

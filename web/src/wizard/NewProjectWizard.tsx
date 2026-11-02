@@ -4,9 +4,10 @@ import { FormProvider, useForm, type FieldError, type Resolver } from "react-hoo
 import { useNavigate } from "react-router";
 import { usePreferences } from "../app/preferences";
 import { UnitsToggle } from "../components/UnitsToggle";
+import { ensureSignedIn } from "../data/auth";
+import { createProject as saveNewProject } from "../data/projects";
 import { createProject } from "../domain/project";
 import type { Units } from "../domain/units";
-import { saveProject } from "../project/localProjects";
 import { BudgetStep } from "./steps/BudgetStep";
 import { OpeningsStep } from "./steps/OpeningsStep";
 import { ReviewStep } from "./steps/ReviewStep";
@@ -43,6 +44,8 @@ export function NewProjectWizard() {
   const navigate = useNavigate();
   const units = usePreferences((state) => state.units);
   const [stepIndex, setStepIndex] = useState(0);
+  const [creating, setCreating] = useState(false);
+  const [createFailed, setCreateFailed] = useState(false);
   const step = STEPS[stepIndex] ?? STEPS[0];
   const isLast = stepIndex === STEPS.length - 1;
 
@@ -82,12 +85,21 @@ export function NewProjectWizard() {
     }
   };
 
-  const create = (values: WizardValues) => {
+  // Nobody has to sign up first: a guest account keeps the room until they sign in with Google.
+  const create = async (values: WizardValues) => {
     if (values.type === "" || values.style === "") return;
     const { name, type, style, ...room } = values;
     const project = createProject(crypto.randomUUID(), name, { ...room, type, style }, new Date());
-    saveProject(project);
-    void navigate(`/p/${project.id}`);
+    setCreating(true);
+    setCreateFailed(false);
+    try {
+      const account = await ensureSignedIn();
+      await saveNewProject(project, account.uid);
+      void navigate(`/p/${project.id}`);
+    } catch {
+      setCreateFailed(true);
+      setCreating(false);
+    }
   };
 
   return (
@@ -151,10 +163,15 @@ export function NewProjectWizard() {
             ) : (
               <span />
             )}
-            <button type="submit" className="btn btn-primary">
-              {isLast ? "Create room" : "Next"}
+            <button type="submit" className="btn btn-primary" disabled={creating}>
+              {isLast ? (creating ? "Creating…" : "Create room") : "Next"}
             </button>
           </div>
+          {createFailed && (
+            <p role="alert" className="mt-4 text-right text-sm text-red-700">
+              We could not save your room. Check your connection and try again.
+            </p>
+          )}
         </form>
       </FormProvider>
     </div>

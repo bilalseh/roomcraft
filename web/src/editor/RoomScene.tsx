@@ -4,6 +4,7 @@ import { FurnitureLayer } from "./furniture/FurnitureLayer";
 import { PlanMeasurements } from "./PlanMeasurements";
 import { RoomShell } from "./RoomShell";
 import { useEditor } from "./state/useEditor";
+import { ThumbnailCapture } from "./ThumbnailCapture";
 import { OrbitView, PlanView, WALK_SURFACE_ID, WalkView } from "./views";
 
 const DAY = { background: "#e7e5e4", sky: 1.3, sun: 1.7 };
@@ -44,6 +45,7 @@ export function RoomScene() {
         shadow-camera-bottom={-span}
       />
 
+      <ThumbnailCapture />
       {mode === "orbit" && <OrbitView room={room} />}
       {mode === "plan" && <PlanView room={room} />}
       {mode === "walk" && <WalkView room={room} />}

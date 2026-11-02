@@ -31,7 +31,7 @@ export function Landing() {
           <Link to="/new" className="btn btn-primary">
             Start a new room
           </Link>
-          <Link to="/p/demo" className="btn btn-secondary">
+          <Link to="/demo" className="btn btn-secondary">
             Try the demo
           </Link>
         </div>

@@ -26,8 +26,14 @@ wall paint and per-piece finishes (all undoable); day/night with lamps as
 point lights; orbit, top-down plan with measurements, and first-person walk;
 clearance warnings (door swing, walkways under 80 cm via grid reachability)
 shared with Python via `shared/fixtures/clearance.json`.
-Current phase: **5, in progress** (save/load, versions, demo mode, share link).
-Needs the Firestore database and Google + Anonymous sign-in enabled.
+Phase 5: built and committed locally, not pushed. Firestore rules are deployed
+(by hand: the CI service account cannot deploy rules). Blocked on the user
+enabling Firebase Authentication (anonymous sign-in returns
+CONFIGURATION_NOT_FOUND). After that: browser-check /demo, autosave, versions,
+share link and My rooms against the real project, then push.
+Rules tests run only in CI (local Java is 8).
+Current phase: **6, in progress** (FastAPI AI assistant). Needs the Gemini key
+and a `roomcraft-api` service account (Cloud Datastore User) on Render.
 
 ### Phase 1 plan (agreed)
 

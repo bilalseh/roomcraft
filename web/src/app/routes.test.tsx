@@ -38,10 +38,17 @@ describe("routes", () => {
     expect(router.state.location.pathname).toBe("/new");
   });
 
-  it("renders the shared plan page", () => {
+  it("explains when a shared plan does not exist", async () => {
     renderAt("/s/abc123");
 
-    expect(screen.getByRole("heading", { level: 1, name: "Shared plan" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: "This shared plan is not available" },
+        // The route's module brings three.js, which jsdom takes a while to load.
+        { timeout: 15_000 },
+      ),
+    ).toBeInTheDocument();
   });
 
   it("renders the not-found page for unknown paths", () => {

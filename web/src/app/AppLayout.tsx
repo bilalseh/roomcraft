@@ -1,4 +1,5 @@
-import { Link, NavLink, Outlet, useMatches } from "react-router";
+import { Link, NavLink, Outlet, useMatches, useNavigation } from "react-router";
+import { AccountMenu } from "./AccountMenu";
 import { ApiStatus } from "./ApiStatus";
 import { Logo } from "./Logo";
 
@@ -14,9 +15,17 @@ function isFullHeight(handle: unknown): boolean {
 
 export function AppLayout() {
   const fullHeight = useMatches().some((match) => isFullHeight(match.handle));
+  const loading = useNavigation().state === "loading";
 
   return (
     <div className={`flex flex-col ${fullHeight ? "h-dvh" : "min-h-dvh"}`}>
+      {loading && (
+        <div
+          role="progressbar"
+          aria-label="Loading"
+          className="fixed inset-x-0 top-0 z-50 h-0.5 animate-pulse bg-teal-600 motion-reduce:animate-none"
+        />
+      )}
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link
@@ -26,13 +35,14 @@ export function AppLayout() {
             <Logo className="size-7" />
             Roomcraft
           </Link>
-          <nav aria-label="Main">
+          <nav aria-label="Main" className="flex items-center gap-1">
             <NavLink
               to="/new"
               className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-teal-700 aria-[current=page]:text-teal-800"
             >
               New room
             </NavLink>
+            <AccountMenu />
           </nav>
         </div>
       </header>

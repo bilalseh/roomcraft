@@ -1,4 +1,5 @@
 import type { Materials } from "@roomcraft/shared";
+import type { StateCreator } from "zustand";
 import { createStore } from "zustand/vanilla";
 import { catalogItem } from "../../domain/catalog";
 import { record, redo, startHistory, undo, type History } from "../../domain/history";
@@ -17,6 +18,8 @@ import {
 } from "../../domain/layout";
 import type { Project } from "../../domain/project";
 import { round, snapToFloor, snapToWall } from "../../domain/snap";
+import { explainProblem } from "./messages";
+import { sessionSlice, type SessionOptions, type SessionSlice } from "./session";
 
 /** An item being dragged: where it would land, and why it cannot, if it cannot. */
 export interface Drag {
@@ -32,17 +35,15 @@ export interface Notice {
   text: string;
 }
 
-export type Lighting = "day" | "night";
-export type CameraMode = "orbit" | "plan" | "walk";
+export type { CameraMode, Lighting, SaveStatus } from "./session";
 
-export interface EditorState {
+/** What is in the room, what is selected, and every change to it. */
+export interface LayoutSlice {
   project: Project;
   history: History<Layout>;
   selectedId: string | null;
   drag: Drag | null;
   notice: Notice | null;
-  lighting: Lighting;
-  cameraMode: CameraMode;
 
   add: (itemId: string) => void;
   select: (id: string | null) => void;
@@ -56,18 +57,34 @@ export interface EditorState {
   setMaterials: (change: Partial<Materials>) => void;
   /** Recolours the selected piece; null restores its catalog colour. */
   setSelectedColor: (color: string | null) => void;
-  setLighting: (lighting: Lighting) => void;
-  setCameraMode: (mode: CameraMode) => void;
+  /** Brings back a saved version, as one step that can be undone. */
+  restore: (layout: Layout) => void;
   undo: () => void;
   redo: () => void;
   dismissNotice: () => void;
 }
 
-export function createEditorStore(
+export type EditorState = LayoutSlice & SessionSlice;
+
+export interface EditorOptions extends SessionOptions {
+  newId?: () => string;
+}
+
+export function createEditorStore(project: Project, options: EditorOptions = {}) {
+  const { newId = () => crypto.randomUUID(), ...session } = options;
+  return createStore<EditorState>()((...store) => ({
+    ...layoutSlice(project, newId)(...store),
+    ...sessionSlice(session)(...store),
+  }));
+}
+
+export type EditorStore = ReturnType<typeof createEditorStore>;
+
+function layoutSlice(
   project: Project,
-  newId: () => string = () => crypto.randomUUID(),
-) {
-  return createStore<EditorState>()((set, get) => {
+  newId: () => string,
+): StateCreator<EditorState, [], [], LayoutSlice> {
+  return (set, get) => {
     const layout = () => get().history.present;
     let noticeKey = 0;
 
@@ -93,8 +110,6 @@ export function createEditorStore(
       selectedId: null,
       drag: null,
       notice: null,
-      lighting: "day",
-      cameraMode: "orbit",
 
       add: (itemId) => {
         const item = catalogItem(itemId);
@@ -177,13 +192,8 @@ export function createEditorStore(
         if (id) apply({ ok: true, layout: setItemColor(layout(), id, color) });
       },
 
-      setLighting: (lighting) => {
-        set({ lighting });
-      },
-
-      // Walking around is for looking, not editing, so it clears the selection.
-      setCameraMode: (cameraMode) => {
-        set(cameraMode === "walk" ? { cameraMode, selectedId: null, drag: null } : { cameraMode });
+      restore: (restored) => {
+        set({ history: record(get().history, restored), selectedId: null, drag: null });
       },
 
       undo: () => {
@@ -207,26 +217,5 @@ export function createEditorStore(
         set({ selectedId: null });
       }
     }
-  });
-}
-
-export type EditorStore = ReturnType<typeof createEditorStore>;
-
-/** A sentence for the person, naming the furniture involved where there is one. */
-export function explainProblem(problem: LayoutProblem, layout: Layout): string {
-  switch (problem.code) {
-    case "outside_room":
-      return "That spot is outside the room.";
-    case "overlaps": {
-      const other = layout.furniture.find((placement) => placement.id === problem.otherId);
-      const name = other ? catalogItem(other.itemId)?.name.toLowerCase() : undefined;
-      return name ? `It would overlap the ${name}.` : "It would overlap another piece.";
-    }
-    case "no_space":
-      return "There is no free space left for it.";
-    case "fixed_rotation":
-      return "Wall pieces always face into the room.";
-    case "unknown_item":
-      return "That piece is no longer in the catalog.";
-  }
+  };
 }
