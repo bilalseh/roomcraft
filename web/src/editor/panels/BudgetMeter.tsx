@@ -25,7 +25,7 @@ export function BudgetMeter() {
   const color = COLORS[state];
 
   return (
-    <div className="space-y-2 border-b border-stone-200 p-4">
+    <div data-tour="budget" className="space-y-2 border-b border-stone-200 p-4">
       <div className="flex items-baseline justify-between gap-2 text-sm">
         <span className="font-medium">{priceRange(cost.min, cost.max)}</span>
         <span className="text-stone-500">of {formatUsd(budget)}</span>

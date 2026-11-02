@@ -7,6 +7,7 @@ import {
 } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
+import { REDUCED_MOTION, useMediaQuery } from "../components/useMediaQuery";
 import { Vector3 } from "three";
 import { pointOnWall, wallFrame } from "../domain/walls";
 
@@ -18,6 +19,8 @@ type RoomSize = Pick<Room, "width" | "depth">;
 /** Looking into the room from above one corner; drag to orbit. */
 export function OrbitView({ room }: { room: RoomSize }) {
   const span = Math.max(room.width, room.depth);
+  // The camera keeps drifting after a drag unless motion is reduced.
+  const reducedMotion = useMediaQuery(REDUCED_MOTION);
   return (
     <>
       <PerspectiveCamera
@@ -33,6 +36,7 @@ export function OrbitView({ room }: { room: RoomSize }) {
         maxPolarAngle={Math.PI / 2.05}
         minDistance={1.5}
         maxDistance={span * 4}
+        enableDamping={!reducedMotion}
       />
     </>
   );

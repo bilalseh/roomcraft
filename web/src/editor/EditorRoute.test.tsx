@@ -6,6 +6,7 @@ import { usePreferences } from "../app/preferences";
 import { createProject, type Project } from "../domain/project";
 import { demoProject } from "../project/demoProject";
 import { ALEX, savedProject, seedProject, signInAs } from "../test/fakeBackend";
+import { matchMediaQueries } from "../test/media";
 import { EditorError } from "./EditorError";
 import { EditorRoute } from "./EditorRoute";
 import { editorLoader } from "./loadProject";
@@ -170,6 +171,19 @@ describe("EditorRoute", () => {
 
     await user.click(screen.getByRole("button", { name: "Stop sharing" }));
     expect(await screen.findByRole("button", { name: "Create a share link" })).toBeInTheDocument();
+  });
+
+  it("becomes a viewer on phones", async () => {
+    matchMediaQueries((query) => query.includes("max-width"));
+    seedDemo();
+    renderEditor("/p/room-1");
+    await heading("Sunny living room");
+
+    expect(
+      screen.getByText(/To edit the room, open it on a tablet or computer/),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Undo" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: /In room/ })).not.toBeInTheDocument();
   });
 
   it("asks people who are signed out to sign in", async () => {

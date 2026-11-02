@@ -2,6 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, vi } from "vitest";
 import { resetFakeBackend } from "./fakeBackend";
+import { installMatchMedia, matchMediaQueries } from "./media";
 
 // Tests never talk to Firebase: the data layer is replaced by an in-memory fake.
 vi.mock("../data/auth", async () => (await import("./fakeBackend")).auth);
@@ -25,8 +26,13 @@ if (!("showModal" in dialog)) {
   });
 }
 
+installMatchMedia();
+
 beforeEach(() => {
   resetFakeBackend();
+  matchMediaQueries(() => false);
+  // The onboarding tour has its own test; elsewhere it counts as seen.
+  localStorage.setItem("roomcraft:tour-seen", "yes");
 });
 
 afterEach(() => {

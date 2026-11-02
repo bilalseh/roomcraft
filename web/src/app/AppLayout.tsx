@@ -26,6 +26,12 @@ export function AppLayout() {
           className="fixed inset-x-0 top-0 z-50 h-0.5 animate-pulse bg-teal-600 motion-reduce:animate-none"
         />
       )}
+      <a
+        href="#main"
+        className="sr-only z-50 rounded-md bg-white px-4 py-2 font-medium focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:outline-2 focus:outline-teal-700"
+      >
+        Skip to main content
+      </a>
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link
@@ -47,7 +53,7 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className="flex min-h-0 flex-1 flex-col">
+      <main id="main" tabIndex={-1} className="flex min-h-0 flex-1 flex-col focus:outline-none">
         <Outlet />
       </main>
 

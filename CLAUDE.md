@@ -43,7 +43,12 @@ Phase 7: built and committed locally, not pushed. Budget meter (price range
 against the budget), shopping list grouped by category with CSV, two-page PDF
 (vector floor plan with measurements, 3D snapshot, shopping list) built with
 jsPDF loaded on demand.
-Current phase: **8, in progress** (accessibility, responsive, onboarding).
+Phase 8: built and committed locally, not pushed. Phones get a read-only
+viewer; reduced motion turns off camera damping; skip link; first-visit
+onboarding tour (remembered in localStorage); axe-core tests on landing,
+wizard and editor (colour contrast checked by hand, jsdom cannot compute it).
+Current phase: **9** (README, screenshots, GIF, final deploy). Screenshots of
+the editor and the assistant GIF need Authentication and the Gemini key live.
 
 ### Phase 1 plan (agreed)
 

@@ -32,6 +32,7 @@ export interface SessionSlice {
   lighting: Lighting;
   cameraMode: CameraMode;
 
+  setReadOnly: (readOnly: boolean) => void;
   setLighting: (lighting: Lighting) => void;
   setCameraMode: (mode: CameraMode) => void;
   setShareId: (shareId: string | null) => void;
@@ -57,6 +58,10 @@ export function sessionSlice(
     lighting: "day",
     cameraMode: "orbit",
 
+    // Switching to viewing only (a phone) also drops the selection and any drag.
+    setReadOnly: (readOnly) => {
+      set(readOnly ? { readOnly, selectedId: null, drag: null } : { readOnly });
+    },
     setLighting: (lighting) => {
       set({ lighting });
     },

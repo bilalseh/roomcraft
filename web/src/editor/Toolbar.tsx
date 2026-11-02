@@ -13,11 +13,13 @@ const BUTTON =
   "rounded-md border border-stone-300 px-3 py-1.5 text-sm hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:opacity-40";
 
 interface ToolbarProps {
+  /** Phones: only what is needed to look around. */
+  compact: boolean;
   assistantOpen: boolean;
   onToggleAssistant: () => void;
 }
 
-export function Toolbar({ assistantOpen, onToggleAssistant }: ToolbarProps) {
+export function Toolbar({ compact, assistantOpen, onToggleAssistant }: ToolbarProps) {
   const name = useEditor((state) => state.project.name);
   const room = useEditor((state) => state.history.present.room);
   const canUndo = useEditor((state) => state.history.past.length > 0);
@@ -40,7 +42,7 @@ export function Toolbar({ assistantOpen, onToggleAssistant }: ToolbarProps) {
         </p>
         <SaveIndicator />
       </div>
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3" hidden={compact}>
         <div className="flex gap-1">
           <button
             type="button"
@@ -85,6 +87,7 @@ export function Toolbar({ assistantOpen, onToggleAssistant }: ToolbarProps) {
           type="button"
           aria-expanded={assistantOpen}
           aria-controls="layout-assistant"
+          data-tour="assistant"
           onClick={onToggleAssistant}
           className="rounded-md bg-violet-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-700"
         >
