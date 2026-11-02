@@ -40,9 +40,11 @@ TS via `shared/fixtures/operations.json`). Web: assistant panel, 3D previews
 three-option mode with thumbnails. What the real model needed: no `maxItems` on
 nested arrays (generic 400, so `plan_response_schema()` leaves array limits to
 validating the answer), low thinking (medium took 167 s against the web client's
-90 s limit; low takes 7 to 12 s), no sampling parameters (deprecated from 3.6). At
-low thinking, plans often include pieces that validation refuses, so answers can
-list ideas left out and summaries can mention them.
+90 s limit), no sampling parameters (deprecated from 3.6). Low thinking refuses
+more pieces, so plans with refusals go back to the model once and the better
+version wins: three runs of three layouts left out 7 ideas in total, against 17
+before, in 14 to 16 s instead of 10 to 13 s. Answers can still list ideas left out,
+and summaries can mention them.
 Phase 7: done. Budget meter (price range against the budget), shopping list
 grouped by category with CSV, two-page PDF (vector floor plan with measurements,
 3D snapshot, shopping list) built with jsPDF loaded on demand.
@@ -103,6 +105,9 @@ and the shell footer shows the API `/health` status.
   secrets: it is public, and committing the Firebase API key would trip
   GitHub secret scanning.
 - Share links are published snapshots, not live views.
+- Render's build filter can skip a deploy: an API commit pushed with a web-only
+  commit on top did not deploy (2026-11-02). Push API commits last, and check what
+  is live in the GitHub deployments for the `main - roomcraft-api` environment.
 - Gemini is paid, not free tier: the terms require paid use for apps open to the
   EEA, Switzerland and the UK. The key on Render belongs to an AI Studio project
   on the prepaid "My Billing Account" ($5 bought 2026-11-02, auto-reload off).
