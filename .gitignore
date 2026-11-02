@@ -4,8 +4,11 @@ node_modules/
 
 # Build output
 dist/
+dist-e2e/
 *.tsbuildinfo
 coverage/
+test-results/
+playwright-report/
 
 # Python caches
 __pycache__/
@@ -14,7 +17,8 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# Environment (committed: .env.example, web/.env.development, web/.env.test)
+# Environment (committed: .env.example, web/.env.development, web/.env.test,
+# web/.env.e2e)
 .env
 .env.local
 .env.*.local

@@ -47,8 +47,14 @@ Phase 8: built and committed locally, not pushed. Phones get a read-only
 viewer; reduced motion turns off camera damping; skip link; first-visit
 onboarding tour (remembered in localStorage); axe-core tests on landing,
 wizard and editor (colour contrast checked by hand, jsdom cannot compute it).
-Current phase: **9** (README, screenshots, GIF, final deploy). Screenshots of
-the editor and the assistant GIF need Authentication and the Gemini key live.
+Current phase: **9** (README, screenshots, GIF, final deploy). README and the
+Playwright happy path (`e2e/`, `pnpm test:e2e`, Auth + Firestore emulators,
+web built with `--mode e2e`) are committed locally. The e2e test runs fully
+only in CI (Firestore emulator needs Java 21); locally the wizard half passes
+against the Auth emulator alone. Docker Desktop is installed but has no WSL
+distro, so it does not start. Before pushing, capture the images the README
+links: `docs/media/assistant.gif` (needs the Gemini key), `editor.png`,
+`plan.png` (need Authentication).
 
 ### Phase 1 plan (agreed)
 

@@ -7,7 +7,15 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["**/dist/", "**/coverage/", "api/", "shared/src/generated/"]),
+  globalIgnores([
+    "**/dist/",
+    "**/dist-e2e/",
+    "**/coverage/",
+    "e2e/test-results/",
+    "e2e/playwright-report/",
+    "api/",
+    "shared/src/generated/",
+  ]),
 
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,

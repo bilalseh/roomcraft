@@ -6,10 +6,13 @@ const envSchema = z.object({
   VITE_FIREBASE_AUTH_DOMAIN: z.string().min(1),
   VITE_FIREBASE_PROJECT_ID: z.string().min(1),
   VITE_FIREBASE_APP_ID: z.string().min(1),
+  // "true" in the end-to-end build, which talks to the local Firebase emulators.
+  VITE_FIREBASE_EMULATORS: z.enum(["true", "false"]).optional(),
 });
 
 export interface AppConfig {
   apiUrl: string;
+  firebaseEmulators: boolean;
   firebase: {
     apiKey: string;
     authDomain: string;
@@ -27,6 +30,7 @@ export function parseConfig(env: Record<string, unknown>): AppConfig {
   const vars = result.data;
   return {
     apiUrl: vars.VITE_API_URL.replace(/\/+$/, ""),
+    firebaseEmulators: vars.VITE_FIREBASE_EMULATORS === "true",
     firebase: {
       apiKey: vars.VITE_FIREBASE_API_KEY,
       authDomain: vars.VITE_FIREBASE_AUTH_DOMAIN,

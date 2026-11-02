@@ -1,5 +1,6 @@
 import type { Auth, User } from "firebase/auth";
 import { create } from "zustand";
+import { config } from "../config";
 import { firebaseApp } from "./firebase";
 
 export interface Account {
@@ -21,8 +22,11 @@ let auth: Promise<Auth> | undefined;
 
 function getAuthInstance(): Promise<Auth> {
   auth ??= Promise.all([import("firebase/auth"), firebaseApp()]).then(
-    ([{ getAuth, onIdTokenChanged }, app]) => {
+    ([{ connectAuthEmulator, getAuth, onIdTokenChanged }, app]) => {
       const instance = getAuth(app);
+      if (config.firebaseEmulators) {
+        connectAuthEmulator(instance, "http://127.0.0.1:9099", { disableWarnings: true });
+      }
       // Fires on sign-in, sign-out and when a guest account is linked to Google.
       onIdTokenChanged(instance, (user) => {
         useAccount.setState({ status: "ready", account: user && toAccount(user) });

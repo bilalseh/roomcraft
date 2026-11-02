@@ -13,8 +13,11 @@ export function firebaseApp(): Promise<FirebaseApp> {
 
 export function database(): Promise<Firestore> {
   firestore ??= Promise.all([import("firebase/firestore"), firebaseApp()]).then(
-    ([{ initializeFirestore }, instance]) =>
-      initializeFirestore(instance, { ignoreUndefinedProperties: true }),
+    ([{ connectFirestoreEmulator, initializeFirestore }, instance]) => {
+      const db = initializeFirestore(instance, { ignoreUndefinedProperties: true });
+      if (config.firebaseEmulators) connectFirestoreEmulator(db, "127.0.0.1", 8080);
+      return db;
+    },
   );
   return firestore;
 }

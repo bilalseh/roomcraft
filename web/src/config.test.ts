@@ -13,6 +13,7 @@ describe("parseConfig", () => {
   it("maps environment variables and trims the trailing slash of the API URL", () => {
     expect(parseConfig(validEnv)).toEqual({
       apiUrl: "https://api.example",
+      firebaseEmulators: false,
       firebase: {
         apiKey: "key",
         authDomain: "demo.firebaseapp.com",
