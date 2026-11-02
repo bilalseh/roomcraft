@@ -35,7 +35,8 @@ async def assist(
     assistant: Annotated[LayoutAssistant | None, Depends(layout_assistant)],
 ) -> AssistResponse:
     """Suggests changes to the room. Every operation returned has been checked against
-    the room's walls, doors, furniture and budget; refused ones say why."""
+    the room's walls, doors, furniture and budget; refused ones say why. Plans with refused
+    operations get one more attempt, so those requests take longer."""
     if assistant is None or limiter is None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "The assistant is not set up yet.")
     try:
