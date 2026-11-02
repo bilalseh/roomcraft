@@ -18,11 +18,11 @@ export function Table({ width, depth, height, color }: ModelProps) {
 }
 
 /** A table with a drawer unit under the right-hand side of the top. */
-export function Desk({ width, depth, height, color }: ModelProps) {
+export function Desk({ width, depth, height, color, lit }: ModelProps) {
   const drawer = Math.min(0.42, width * 0.3);
   return (
     <group>
-      <Table width={width} depth={depth} height={height} color={color} />
+      <Table width={width} depth={depth} height={height} color={color} lit={lit} />
       <Block
         at={[width / 2 - drawer / 2 - 0.04, height - TOP - 0.08, 0]}
         size={[drawer, 0.16, depth - 0.08]}

@@ -1,12 +1,13 @@
-import type { CatalogItem, Placement, Room } from "@roomcraft/shared";
+import type { CatalogItem, Materials, Placement, Room } from "@roomcraft/shared";
 import { catalogItem } from "./catalog";
 import { collide, footprint, insideRoom } from "./placement";
 import { GRID, snapToFloor, snapToWall } from "./snap";
 
-/** The undoable part of a project: the room and the furniture in it. */
+/** The undoable part of a project: the room, its finishes and the furniture in it. */
 export interface Layout {
   room: Room;
   furniture: Placement[];
+  materials: Materials;
 }
 
 export type LayoutProblem =
@@ -64,6 +65,22 @@ export function rotateItem(layout: Layout, id: string, steps: number): LayoutRes
   if (item.layer === "wall") return { ok: false, problem: { code: "fixed_rotation" } };
   const rotation = (((current.rotation + steps * 15) % 360) + 360) % 360;
   return updateItem(layout, id, { rotation });
+}
+
+export function setMaterials(layout: Layout, change: Partial<Materials>): Layout {
+  return { ...layout, materials: { ...layout.materials, ...change } };
+}
+
+/** Recolours a piece; null restores the catalog colour. */
+export function setItemColor(layout: Layout, id: string, color: string | null): Layout {
+  return {
+    ...layout,
+    furniture: layout.furniture.map((placement) => {
+      if (placement.id !== id) return placement;
+      const { color: _color, ...rest } = placement;
+      return color === null ? rest : { ...rest, color };
+    }),
+  };
 }
 
 export function removeItem(layout: Layout, id: string): Layout {

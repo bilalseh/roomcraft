@@ -61,7 +61,7 @@ export function insideRoom(width: number, depth: number, item: Footprint): boole
 /** Whether two items get in each other's way: same layer, rugs excepted, shapes overlapping. */
 export function collide(a: Footprint, b: Footprint): boolean {
   if (a.layer !== b.layer || a.layer === "rug") return false;
-  return overlap(corners(a), corners(b));
+  return polygonsOverlap(corners(a), corners(b));
 }
 
 /**
@@ -85,16 +85,10 @@ export function placementProblems(
   return problems;
 }
 
-/** Separating axis test for two convex quadrilaterals. */
-function overlap(a: Quad, b: Quad): boolean {
-  for (const [p0, p1, p2, p3] of [a, b]) {
-    const edges: [Vec2, Vec2][] = [
-      [p0, p1],
-      [p1, p2],
-      [p2, p3],
-      [p3, p0],
-    ];
-    for (const [[x1, z1], [x2, z2]] of edges) {
+/** Separating axis test for two convex polygons. Touching edges do not overlap. */
+export function polygonsOverlap(a: readonly Vec2[], b: readonly Vec2[]): boolean {
+  for (const polygon of [a, b]) {
+    for (const [[x1, z1], [x2, z2]] of edges(polygon)) {
       const axis: Vec2 = [z1 - z2, x2 - x1];
       const [aMin, aMax] = project(a, axis);
       const [bMin, bMax] = project(b, axis);
@@ -104,7 +98,11 @@ function overlap(a: Quad, b: Quad): boolean {
   return true;
 }
 
-function project(polygon: Vec2[], axis: Vec2): [min: number, max: number] {
+function edges(polygon: readonly Vec2[]): [Vec2, Vec2][] {
+  return polygon.map((point, index) => [point, polygon[(index + 1) % polygon.length] ?? point]);
+}
+
+function project(polygon: readonly Vec2[], axis: Vec2): [min: number, max: number] {
   const length = Math.hypot(axis[0], axis[1]);
   const values = polygon.map(([x, z]) => (x * axis[0] + z * axis[1]) / length);
   return [Math.min(...values), Math.max(...values)];

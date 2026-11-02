@@ -1,9 +1,11 @@
 import { Cylinder, type ModelProps } from "../parts";
 
 const SHADE = 0.3;
+const GLOW = "#ffcf8a";
+const LAMPLIGHT = "#ffd9a6";
 
-/** A weighted base, a slim pole and a fabric shade in the item's colour. */
-export function FloorLamp({ width, height, color }: ModelProps) {
+/** A weighted base, a slim pole and a fabric shade that glows at night. */
+export function FloorLamp({ width, height, color, lit }: ModelProps) {
   const pole = height - SHADE;
   return (
     <group>
@@ -16,13 +18,23 @@ export function FloorLamp({ width, height, color }: ModelProps) {
         height={SHADE}
         color={color}
         roughness={0.95}
+        {...(lit ? { emissive: GLOW } : {})}
       />
+      {lit && (
+        <pointLight
+          position={[0, pole + SHADE / 2, 0]}
+          color={LAMPLIGHT}
+          intensity={3}
+          distance={6}
+          decay={2}
+        />
+      )}
     </group>
   );
 }
 
 /** A shade hanging from the ceiling on a cord; its origin is the bottom of the shade. */
-export function Pendant({ width, height, color }: ModelProps) {
+export function Pendant({ width, height, color, lit }: ModelProps) {
   const shade = height * 0.45;
   const cord = height - shade;
   return (
@@ -35,7 +47,17 @@ export function Pendant({ width, height, color }: ModelProps) {
         height={shade}
         color={color}
         roughness={0.5}
+        {...(lit ? { emissive: "#3a2a14" } : {})}
       />
+      {lit && (
+        <pointLight
+          position={[0, -0.05, 0]}
+          color={LAMPLIGHT}
+          intensity={5}
+          distance={8}
+          decay={2}
+        />
+      )}
     </group>
   );
 }

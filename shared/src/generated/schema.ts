@@ -28,6 +28,8 @@ export interface CatalogItem {
 
 export type Category = "seating" | "tables" | "storage" | "beds" | "lighting" | "decor";
 
+export type FloorMaterial = "wood" | "tile" | "carpet";
+
 /**
  * Response of `GET /health`.
  */
@@ -37,6 +39,15 @@ export interface HealthResponse {
 }
 
 export type Layer = "floor" | "rug" | "wall" | "ceiling";
+
+/**
+ * The room's finishes: floor material and colour, and wall paint.
+ */
+export interface Materials {
+  floor: FloorMaterial;
+  floorColor: string;
+  wallColor: string;
+}
 
 export type ModelKind =
   | "sofa"

@@ -1,6 +1,7 @@
-import type { Opening, Placement, Room } from "@roomcraft/shared";
+import type { Materials, Opening, Placement, Room } from "@roomcraft/shared";
 import { z } from "zod";
 import { OPENING_LIMITS, ROOM_LIMITS } from "./limits";
+import { FLOOR_MATERIALS } from "./materials";
 import { OPENING_KINDS, ROOM_TYPES, STYLES, WALLS } from "./room";
 
 // Runtime validation for data from outside the app (storage, seed files). The
@@ -38,3 +39,11 @@ export const placementSchema = z.strictObject({
     .nullable()
     .exactOptional(),
 }) satisfies z.ZodType<Placement>;
+
+const hexColor = z.string().regex(/^#[0-9a-f]{6}$/);
+
+export const materialsSchema = z.strictObject({
+  floor: z.enum(FLOOR_MATERIALS),
+  floorColor: hexColor,
+  wallColor: hexColor,
+}) satisfies z.ZodType<Materials>;

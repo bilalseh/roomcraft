@@ -11,6 +11,7 @@ from pydantic.json_schema import JsonSchemaMode
 
 from roomcraft_api.schemas.furniture import CatalogItem, Placement, PriceRange
 from roomcraft_api.schemas.health import HealthResponse
+from roomcraft_api.schemas.materials import Materials
 from roomcraft_api.schemas.room import Opening, Room
 
 SHARED_MODELS: tuple[tuple[type[BaseModel], JsonSchemaMode], ...] = (
@@ -18,12 +19,14 @@ SHARED_MODELS: tuple[tuple[type[BaseModel], JsonSchemaMode], ...] = (
     (Room, "validation"),
     (CatalogItem, "validation"),
     (Placement, "validation"),
+    (Materials, "validation"),
 )
 
 __all__ = [
     "SHARED_MODELS",
     "CatalogItem",
     "HealthResponse",
+    "Materials",
     "Opening",
     "Placement",
     "PriceRange",

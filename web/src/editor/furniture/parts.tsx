@@ -6,6 +6,8 @@ export interface ModelProps {
   depth: number;
   height: number;
   color: string;
+  /** Night lighting: lamps glow and light the room. */
+  lit: boolean;
 }
 
 type Vec3 = [x: number, y: number, z: number];
@@ -37,13 +39,21 @@ interface CylinderProps {
   /** Radius at the top, for cones and lamp shades. Defaults to `radius`. */
   topRadius?: number;
   roughness?: number;
+  /** A glow colour, for lit lamp shades. */
+  emissive?: string;
 }
 
-export function Cylinder({ at, radius, height, color, topRadius, roughness = 0.7 }: CylinderProps) {
+export function Cylinder(props: CylinderProps) {
+  const { at, radius, height, color, topRadius, roughness = 0.7, emissive = "#000000" } = props;
   return (
     <mesh position={at} castShadow receiveShadow>
       <cylinderGeometry args={[topRadius ?? radius, radius, height, 24]} />
-      <meshStandardMaterial color={color} roughness={roughness} />
+      <meshStandardMaterial
+        color={color}
+        roughness={roughness}
+        emissive={emissive}
+        emissiveIntensity={1.4}
+      />
     </mesh>
   );
 }

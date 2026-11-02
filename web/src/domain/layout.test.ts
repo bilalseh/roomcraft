@@ -1,6 +1,7 @@
 import type { Placement, Room } from "@roomcraft/shared";
 import { describe, expect, it } from "vitest";
 import { catalogItem } from "./catalog";
+import { defaultMaterials } from "./materials";
 import {
   addItem,
   duplicateItem,
@@ -22,7 +23,8 @@ const room: Room = {
 };
 
 const sofa: Placement = { id: "sofa", itemId: "sofa-three-seat", x: 2, z: 0.45, rotation: 0 };
-const layout = (...furniture: Placement[]): Layout => ({ room, furniture });
+const materials = defaultMaterials(room.style);
+const layout = (...furniture: Placement[]): Layout => ({ room, furniture, materials });
 
 function item(id: string) {
   const found = catalogItem(id);
@@ -60,7 +62,7 @@ describe("addItem", () => {
   it("reports when the room is full", () => {
     const tiny = { ...room, width: 1.5, depth: 1.5 };
 
-    expect(addItem({ room: tiny, furniture: [] }, item("bed-queen"), "bed")).toEqual({
+    expect(addItem({ room: tiny, furniture: [], materials }, item("bed-queen"), "bed")).toEqual({
       ok: false,
       problem: { code: "no_space" },
     });

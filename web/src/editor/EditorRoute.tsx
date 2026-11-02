@@ -3,6 +3,9 @@ import { useLoaderData } from "react-router";
 import { DEMO_PROJECT_ID } from "../project/demoProject";
 import type { editorLoader } from "./loadProject";
 import { NoticeToast } from "./panels/NoticeToast";
+import { ViewControls } from "./panels/ViewControls";
+import { WalkHint } from "./panels/WalkHint";
+import { WarningsPanel } from "./panels/WarningsPanel";
 import { SelectionCard } from "./panels/SelectionCard";
 import { Sidebar } from "./panels/Sidebar";
 import { RoomScene } from "./RoomScene";
@@ -40,11 +43,16 @@ function Editor() {
             <div className="absolute inset-0">
               <RoomScene />
             </div>
-            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center">
+            <div className="pointer-events-none absolute inset-x-4 top-4 flex flex-wrap items-start justify-between gap-2">
+              <WarningsPanel />
+              <ViewControls />
+            </div>
+            <div className="pointer-events-none absolute inset-x-0 top-16 flex justify-center">
               <NoticeToast />
             </div>
             <div className="pointer-events-none absolute bottom-4 left-4">
               <SelectionCard />
+              <WalkHint />
             </div>
           </div>
         </div>

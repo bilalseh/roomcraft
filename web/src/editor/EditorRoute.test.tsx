@@ -29,7 +29,7 @@ function renderEditor(path: string) {
   return userEvent.setup();
 }
 
-const roomTab = () => screen.getByRole("tab", { name: /In this room/ });
+const roomTab = () => screen.getByRole("tab", { name: /In room/ });
 
 describe("EditorRoute", () => {
   beforeEach(() => {
@@ -45,7 +45,7 @@ describe("EditorRoute", () => {
       screen.getByText("Living room · 5.2 × 4.2 m · Scandinavian · Budget $4,000"),
     ).toBeInTheDocument();
     expect(screen.getByText("Demo: changes are not saved")).toBeInTheDocument();
-    expect(roomTab()).toHaveTextContent("In this room (11)");
+    expect(roomTab()).toHaveTextContent("In room (11)");
   });
 
   it("adds furniture from the catalog, and undoes and redoes it", async () => {
@@ -53,14 +53,14 @@ describe("EditorRoute", () => {
     await screen.findByRole("heading", { name: /Sunny living room/ });
 
     await user.click(screen.getByRole("button", { name: "Add ottoman" }));
-    expect(roomTab()).toHaveTextContent("In this room (12)");
+    expect(roomTab()).toHaveTextContent("In room (12)");
     expect(screen.getByRole("region", { name: "Selected furniture" })).toHaveTextContent("Ottoman");
 
     await user.click(screen.getByRole("button", { name: "Undo" }));
-    expect(roomTab()).toHaveTextContent("In this room (11)");
+    expect(roomTab()).toHaveTextContent("In room (11)");
 
     await user.keyboard("{Control>}{Shift>}z{/Shift}{/Control}");
-    expect(roomTab()).toHaveTextContent("In this room (12)");
+    expect(roomTab()).toHaveTextContent("In room (12)");
   });
 
   it("selects furniture from the list and removes it with the keyboard", async () => {
@@ -90,6 +90,37 @@ describe("EditorRoute", () => {
     await waitFor(() => {
       expect(loadProject("abc")?.furniture.map((placement) => placement.itemId)).toEqual(["desk"]);
     });
+  });
+
+  it("changes the floor in the Finishes tab, as an undoable step", async () => {
+    const user = renderEditor("/p/demo");
+    await screen.findByRole("heading", { name: /Sunny living room/ });
+
+    await user.click(screen.getByRole("tab", { name: "Finishes" }));
+    await user.click(screen.getByRole("radio", { name: "Carpet" }));
+    expect(screen.getByRole("radio", { name: "Oatmeal" })).toBeChecked();
+
+    await user.click(screen.getByRole("button", { name: "Undo" }));
+    expect(screen.getByRole("radio", { name: "Wood" })).toBeChecked();
+  });
+
+  it("warns about a blocked door and selects the piece in the way", async () => {
+    const { room } = demoProject();
+    const project = createProject("blocked", "Blocked door", room, new Date());
+    // The demo door is on the south wall, 0.6 m from the corner; this chair stands in its swing.
+    project.furniture = [{ id: "chair", itemId: "armchair", x: 1.2, z: 3.6, rotation: 0 }];
+    saveProject(project);
+    const user = renderEditor("/p/blocked");
+    await screen.findByRole("heading", { name: "Blocked door" });
+
+    await user.click(screen.getByRole("button", { name: "1 layout warning" }));
+    await user.click(
+      screen.getByRole("button", { name: "The armchair stops a door from opening fully." }),
+    );
+
+    expect(screen.getByRole("region", { name: "Selected furniture" })).toHaveTextContent(
+      "Armchair",
+    );
   });
 
   it("explains when a room cannot be found", async () => {

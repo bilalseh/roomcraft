@@ -88,6 +88,14 @@
       ],
       "type": "string"
     },
+    "FloorMaterial": {
+      "enum": [
+        "wood",
+        "tile",
+        "carpet"
+      ],
+      "type": "string"
+    },
     "HealthResponse": {
       "additionalProperties": false,
       "description": "Response of `GET /health`.",
@@ -115,6 +123,30 @@
         "ceiling"
       ],
       "type": "string"
+    },
+    "Materials": {
+      "additionalProperties": false,
+      "description": "The room's finishes: floor material and colour, and wall paint.",
+      "properties": {
+        "floor": {
+          "$ref": "#/$defs/FloorMaterial"
+        },
+        "floorColor": {
+          "pattern": "^#[0-9a-f]{6}$",
+          "type": "string"
+        },
+        "wallColor": {
+          "pattern": "^#[0-9a-f]{6}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "floor",
+        "floorColor",
+        "wallColor"
+      ],
+      "title": "Materials",
+      "type": "object"
     },
     "ModelKind": {
       "enum": [

@@ -54,7 +54,7 @@ def collide(a: Footprint, b: Footprint) -> bool:
     """Whether two items get in each other's way: same layer, rugs excepted, shapes overlapping."""
     if a.layer != b.layer or a.layer == "rug":
         return False
-    return _overlap(corners(a), corners(b))
+    return polygons_overlap(corners(a), corners(b))
 
 
 def placement_problems(
@@ -70,8 +70,8 @@ def placement_problems(
     return problems
 
 
-def _overlap(a: list[Point], b: list[Point]) -> bool:
-    """Separating axis test for two convex quadrilaterals."""
+def polygons_overlap(a: list[Point], b: list[Point]) -> bool:
+    """Separating axis test for two convex polygons. Touching edges do not overlap."""
     for polygon in (a, b):
         for i in range(len(polygon)):
             (x1, z1), (x2, z2) = polygon[i], polygon[(i + 1) % len(polygon)]

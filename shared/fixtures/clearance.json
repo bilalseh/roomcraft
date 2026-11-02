@@ -1,0 +1,312 @@
+{
+  "description": "Clearance rules shared by web/src/domain/clearance.ts and api/src/roomcraft_api/domain/clearance.py. Floor-layer items block door swings (a quarter circle as wide as the door, hinged at the opening's start and swinging into the room). Seating, tables, storage and beds must be reachable from a door along a walkway at least 80 cm wide, checked on a 5 cm grid. Door issues come first, by opening then item order; then hard_to_reach issues in item order.",
+  "cases": [
+    {
+      "name": "an empty room has nothing to warn about",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [],
+      "issues": []
+    },
+    {
+      "name": "a chair in the door's swing",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "armchair",
+          "x": 0.7,
+          "z": 2.5,
+          "rotation": 0,
+          "width": 0.8,
+          "depth": 0.8,
+          "layer": "floor",
+          "category": "seating"
+        }
+      ],
+      "issues": [
+        {
+          "code": "door_swing_blocked",
+          "itemId": "armchair",
+          "openingId": "door"
+        }
+      ]
+    },
+    {
+      "name": "furniture just clear of the swing",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "armchair",
+          "x": 1.6,
+          "z": 2.5,
+          "rotation": 0,
+          "width": 0.8,
+          "depth": 0.8,
+          "layer": "floor",
+          "category": "seating"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "name": "a rug can lie in the swing",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "rug",
+          "x": 1.0,
+          "z": 2.2,
+          "rotation": 0,
+          "width": 2.0,
+          "depth": 1.4,
+          "layer": "rug",
+          "category": "decor"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "name": "a bookshelf behind a 60 cm gap is hard to reach",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "sideboard",
+          "x": 1.7,
+          "z": 1.5,
+          "rotation": 0,
+          "width": 3.4,
+          "depth": 0.6,
+          "layer": "floor",
+          "category": "storage"
+        },
+        {
+          "id": "bookshelf",
+          "x": 1.95,
+          "z": 0.175,
+          "rotation": 0,
+          "width": 0.9,
+          "depth": 0.35,
+          "layer": "floor",
+          "category": "storage"
+        }
+      ],
+      "issues": [
+        {
+          "code": "hard_to_reach",
+          "itemId": "bookshelf"
+        }
+      ]
+    },
+    {
+      "name": "the same bookshelf behind a 1 m gap is fine",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "sideboard",
+          "x": 1.5,
+          "z": 1.5,
+          "rotation": 0,
+          "width": 3.0,
+          "depth": 0.6,
+          "layer": "floor",
+          "category": "storage"
+        },
+        {
+          "id": "bookshelf",
+          "x": 1.95,
+          "z": 0.175,
+          "rotation": 0,
+          "width": 0.9,
+          "depth": 0.35,
+          "layer": "floor",
+          "category": "storage"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "name": "decor in a closed-off corner does not need a walkway",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "sideboard",
+          "x": 1.7,
+          "z": 1.5,
+          "rotation": 0,
+          "width": 3.4,
+          "depth": 0.6,
+          "layer": "floor",
+          "category": "storage"
+        },
+        {
+          "id": "plant",
+          "x": 0.5,
+          "z": 0.5,
+          "rotation": 0,
+          "width": 0.5,
+          "depth": 0.5,
+          "layer": "floor",
+          "category": "decor"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "name": "door issues come first; the room is walked from every door that opens",
+      "room": {
+        "width": 4.0,
+        "depth": 3.0,
+        "openings": [
+          {
+            "id": "door",
+            "kind": "door",
+            "wall": "south",
+            "offset": 0.2,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          },
+          {
+            "id": "north-door",
+            "kind": "door",
+            "wall": "north",
+            "offset": 2.8,
+            "width": 0.9,
+            "height": 2.1,
+            "sill": 0
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "armchair",
+          "x": 0.7,
+          "z": 2.5,
+          "rotation": 0,
+          "width": 0.8,
+          "depth": 0.8,
+          "layer": "floor",
+          "category": "seating"
+        },
+        {
+          "id": "sideboard",
+          "x": 1.7,
+          "z": 1.5,
+          "rotation": 0,
+          "width": 3.4,
+          "depth": 0.6,
+          "layer": "floor",
+          "category": "storage"
+        }
+      ],
+      "issues": [
+        {
+          "code": "door_swing_blocked",
+          "itemId": "armchair",
+          "openingId": "door"
+        },
+        {
+          "code": "hard_to_reach",
+          "itemId": "armchair"
+        }
+      ]
+    }
+  ]
+}

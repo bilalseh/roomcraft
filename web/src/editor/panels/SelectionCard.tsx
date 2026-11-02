@@ -1,5 +1,7 @@
 import { usePreferences } from "../../app/preferences";
+import { SwatchPicker } from "../../components/SwatchPicker";
 import { catalogItem } from "../../domain/catalog";
+import { FINISH_SWATCHES } from "../../domain/materials";
 import { formatUsd } from "../../domain/money";
 import { formatDimensions } from "../../domain/units";
 import { useEditor } from "../state/useEditor";
@@ -12,6 +14,7 @@ export function SelectionCard() {
   const rotate = useEditor((state) => state.rotateSelected);
   const duplicate = useEditor((state) => state.duplicateSelected);
   const remove = useEditor((state) => state.removeSelected);
+  const setColor = useEditor((state) => state.setSelectedColor);
   const units = usePreferences((state) => state.units);
   const item = placement && catalogItem(placement.itemId);
   if (!placement || !item) return null;
@@ -62,6 +65,25 @@ export function SelectionCard() {
             {action.label}
           </button>
         ))}
+      </div>
+      <div className="mt-4">
+        <SwatchPicker
+          legend="Finish"
+          swatches={FINISH_SWATCHES}
+          value={placement.color ?? null}
+          onChange={setColor}
+        />
+        {placement.color && (
+          <button
+            type="button"
+            onClick={() => {
+              setColor(null);
+            }}
+            className="mt-2 text-sm font-medium text-teal-800 hover:underline focus-visible:outline-2 focus-visible:outline-teal-700"
+          >
+            Original finish
+          </button>
+        )}
       </div>
       <p className="mt-3 text-xs text-stone-500">Drag to move it, or use the arrow keys.</p>
     </section>

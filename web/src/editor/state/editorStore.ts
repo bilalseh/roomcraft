@@ -1,3 +1,4 @@
+import type { Materials } from "@roomcraft/shared";
 import { createStore } from "zustand/vanilla";
 import { catalogItem } from "../../domain/catalog";
 import { record, redo, startHistory, undo, type History } from "../../domain/history";
@@ -7,6 +8,8 @@ import {
   placementProblem,
   removeItem,
   rotateItem,
+  setItemColor,
+  setMaterials,
   updateItem,
   type Layout,
   type LayoutProblem,
@@ -29,12 +32,17 @@ export interface Notice {
   text: string;
 }
 
+export type Lighting = "day" | "night";
+export type CameraMode = "orbit" | "plan" | "walk";
+
 export interface EditorState {
   project: Project;
   history: History<Layout>;
   selectedId: string | null;
   drag: Drag | null;
   notice: Notice | null;
+  lighting: Lighting;
+  cameraMode: CameraMode;
 
   add: (itemId: string) => void;
   select: (id: string | null) => void;
@@ -45,6 +53,11 @@ export interface EditorState {
   rotateSelected: (steps: number) => void;
   duplicateSelected: () => void;
   removeSelected: () => void;
+  setMaterials: (change: Partial<Materials>) => void;
+  /** Recolours the selected piece; null restores its catalog colour. */
+  setSelectedColor: (color: string | null) => void;
+  setLighting: (lighting: Lighting) => void;
+  setCameraMode: (mode: CameraMode) => void;
   undo: () => void;
   redo: () => void;
   dismissNotice: () => void;
@@ -72,10 +85,16 @@ export function createEditorStore(
 
     return {
       project,
-      history: startHistory<Layout>({ room: project.room, furniture: project.furniture }),
+      history: startHistory<Layout>({
+        room: project.room,
+        furniture: project.furniture,
+        materials: project.materials,
+      }),
       selectedId: null,
       drag: null,
       notice: null,
+      lighting: "day",
+      cameraMode: "orbit",
 
       add: (itemId) => {
         const item = catalogItem(itemId);
@@ -147,6 +166,24 @@ export function createEditorStore(
       removeSelected: () => {
         const id = get().selectedId;
         if (id) apply({ ok: true, layout: removeItem(layout(), id) }, null);
+      },
+
+      setMaterials: (change) => {
+        apply({ ok: true, layout: setMaterials(layout(), change) });
+      },
+
+      setSelectedColor: (color) => {
+        const id = get().selectedId;
+        if (id) apply({ ok: true, layout: setItemColor(layout(), id, color) });
+      },
+
+      setLighting: (lighting) => {
+        set({ lighting });
+      },
+
+      // Walking around is for looking, not editing, so it clears the selection.
+      setCameraMode: (cameraMode) => {
+        set(cameraMode === "walk" ? { cameraMode, selectedId: null, drag: null } : { cameraMode });
       },
 
       undo: () => {

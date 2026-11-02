@@ -1,25 +1,29 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { useEditor } from "../state/useEditor";
 import { CatalogPanel } from "./CatalogPanel";
+import { FinishesPanel } from "./FinishesPanel";
 import { RoomItemsPanel } from "./RoomItemsPanel";
 
-type Tab = "catalog" | "room";
+type Tab = "catalog" | "room" | "finishes";
 
-/** Two tabs: the catalog to add from, and what is already in the room. */
+/** The catalog to add from, what is already in the room, and the room's finishes. */
 export function Sidebar() {
   const count = useEditor((state) => state.history.present.furniture.length);
   const [tab, setTab] = useState<Tab>("catalog");
   const id = useId();
   const tabs: { value: Tab; label: string }[] = [
-    { value: "catalog", label: "Add furniture" },
-    { value: "room", label: `In this room (${count})` },
+    { value: "catalog", label: "Catalog" },
+    { value: "room", label: `In room (${count})` },
+    { value: "finishes", label: "Finishes" },
   ];
   const buttons = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
 
   // Arrow keys move between tabs, as in any tab list.
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    const next: Tab = tab === "catalog" ? "room" : "catalog";
+    const step = event.key === "ArrowRight" ? 1 : tabs.length - 1;
+    const index = tabs.findIndex((candidate) => candidate.value === tab);
+    const next = tabs[(index + step) % tabs.length]?.value ?? tab;
     setTab(next);
     buttons.current[next]?.focus();
   };
@@ -59,7 +63,9 @@ export function Sidebar() {
         aria-labelledby={`${id}-${tab}-tab`}
         className="min-h-0 flex-1 overflow-y-auto"
       >
-        {tab === "catalog" ? <CatalogPanel /> : <RoomItemsPanel />}
+        {tab === "catalog" && <CatalogPanel />}
+        {tab === "room" && <RoomItemsPanel />}
+        {tab === "finishes" && <FinishesPanel />}
       </div>
     </div>
   );

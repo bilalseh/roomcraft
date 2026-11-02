@@ -21,8 +21,13 @@ Phase 3: done. 26-item catalog in `shared/catalog`, placement rules (SAT
 collision, layers) shared with Python via `shared/fixtures/placement.json`,
 per-editor Zustand store over pure layout operations with snapshot undo/redo,
 procedural models with instanced legs, drag/snap/rotate, keyboard shortcuts.
-Current phase: **4, in progress** (materials, lighting, camera modes, clearance
-warnings).
+Phase 4: done. Materials model (shared schema) with procedural floor textures,
+wall paint and per-piece finishes (all undoable); day/night with lamps as
+point lights; orbit, top-down plan with measurements, and first-person walk;
+clearance warnings (door swing, walkways under 80 cm via grid reachability)
+shared with Python via `shared/fixtures/clearance.json`.
+Current phase: **5, in progress** (save/load, versions, demo mode, share link).
+Needs the Firestore database and Google + Anonymous sign-in enabled.
 
 ### Phase 1 plan (agreed)
 

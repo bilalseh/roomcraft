@@ -83,4 +83,36 @@ describe("editor store", () => {
     expect(furniture(store)[0]?.rotation).toBe(0);
     expect(store.getState().notice?.text).toBe("Wall pieces always face into the room.");
   });
+
+  it("changes finishes as undoable steps", () => {
+    const store = storeWith([]);
+    const before = store.getState().history.present.materials;
+
+    store.getState().setMaterials({ floor: "carpet", floorColor: "#55565a" });
+    expect(store.getState().history.present.materials).toMatchObject({ floor: "carpet" });
+
+    store.getState().undo();
+    expect(store.getState().history.present.materials).toEqual(before);
+  });
+
+  it("recolours the selected piece and restores its catalog colour", () => {
+    const store = storeWith([sofa]);
+    store.getState().select("sofa");
+
+    store.getState().setSelectedColor("#a3593f");
+    expect(furniture(store)[0]?.color).toBe("#a3593f");
+
+    store.getState().setSelectedColor(null);
+    expect(furniture(store)[0]).not.toHaveProperty("color");
+  });
+
+  it("clears the selection when walking around", () => {
+    const store = storeWith([sofa]);
+    store.getState().select("sofa");
+
+    store.getState().setCameraMode("walk");
+
+    expect(store.getState().selectedId).toBeNull();
+    expect(store.getState().history.past).toHaveLength(0);
+  });
 });

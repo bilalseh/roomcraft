@@ -10,11 +10,16 @@ import { MODELS } from "./models";
 const FLOOR = new Plane(new Vector3(0, 1, 0), 0);
 const SELECTED = "#0f766e";
 const INVALID = "#dc2626";
+const WARNING = "#d97706";
 
 interface FurnitureItemProps {
   placement: Placement;
   item: CatalogItem;
   room: Room;
+  /** Night lighting: lamps are on. */
+  lit: boolean;
+  /** Part of a clearance warning. */
+  warned: boolean;
 }
 
 /**
@@ -25,10 +30,13 @@ export const FurnitureItem = memo(function FurnitureItem({
   placement,
   item,
   room,
+  lit,
+  warned,
 }: FurnitureItemProps) {
   const store = useEditorStore();
   const drag = useEditor((state) => (state.drag?.id === placement.id ? state.drag : null));
   const selected = useEditor((state) => state.selectedId === placement.id);
+  const editable = useEditor((state) => state.cameraMode !== "walk");
   const controls = useThree((state) => state.controls);
   const grab = useRef<{ dx: number; dz: number } | null>(null);
   const hit = useMemo(() => new Vector3(), []);
@@ -44,7 +52,7 @@ export const FurnitureItem = memo(function FurnitureItem({
   };
 
   const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || !editable) return;
     event.stopPropagation();
     store.getState().select(placement.id);
     const point = floorPoint(event);
@@ -83,9 +91,13 @@ export const FurnitureItem = memo(function FurnitureItem({
           depth={item.depth}
           height={item.height}
           color={placement.color ?? item.color}
+          lit={lit}
         />
       </HiddenWithWall>
-      {(selected || drag) && <SelectionBox item={item} invalid={drag?.problem != null} />}
+      {(selected || drag) && (
+        <SelectionBox item={item} color={drag?.problem ? INVALID : SELECTED} />
+      )}
+      {warned && !selected && !drag && <SelectionBox item={item} color={WARNING} />}
     </group>
   );
 });
@@ -102,8 +114,7 @@ function HiddenWithWall(props: { room: Room; rotation: number | null; children: 
   return <group ref={group}>{children}</group>;
 }
 
-function SelectionBox({ item, invalid }: { item: CatalogItem; invalid: boolean }) {
-  const color = invalid ? INVALID : SELECTED;
+function SelectionBox({ item, color }: { item: CatalogItem; color: string }) {
   const pad = 0.03;
   return (
     <group>

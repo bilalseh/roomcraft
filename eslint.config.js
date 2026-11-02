@@ -21,6 +21,8 @@ export default defineConfig([
     },
     rules: {
       "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
+      // `const { omitted, ...rest } = value` is how a property is removed immutably.
+      "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }],
       "@typescript-eslint/only-throw-error": [
         "error",
         {
