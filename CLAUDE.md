@@ -57,6 +57,18 @@ Playwright happy path (`e2e/`, `pnpm test:e2e`, Auth + Firestore emulators, web
 built with `--mode e2e`). The e2e test runs fully only in CI (Firestore emulator
 needs Java 21); locally the wizard half passes against the Auth emulator alone.
 Docker Desktop is installed but has no WSL distro, so it does not start.
+Realism pass (2026-11-07, asked for after phase 9): rounded procedural pieces,
+CC0 Poly Haven textures (grey colour maps tinted by the piece colour, UVs in
+metres), skirting and opening frames (`domain/trim.ts`), a scanned CC0 plant,
+RoomEnvironment lighting, PCSS shadows, and N8AO, bloom, Khronos Neutral tone
+mapping and SMAA through `@react-three/postprocessing` (the canvas is `flat`). A
+Photo button path traces the view with `three-gpu-pathtracer` 0.0.27, loaded on
+demand. Gotchas: N8AO fails with composer multisampling and with `halfRes` on
+three r187. The tracer skips instanced meshes and quantized glTF, draws invisible
+meshes, cannot read a PMREM map and shows point light ranges as hard edges, so a
+photo uses separate leg meshes, float geometry, a gradient sky, no outlines, and
+lamps without a range. Thumbnails render through the effects with `advance()`.
+Headless Edge uses the laptop's RTX GPU unless SwiftShader is forced.
 
 ### Phase 1 plan (agreed)
 

@@ -10,6 +10,7 @@ import { Sidebar } from "./panels/Sidebar";
 import { ViewControls } from "./panels/ViewControls";
 import { WalkHint } from "./panels/WalkHint";
 import { WarningsPanel } from "./panels/WarningsPanel";
+import { PhotoPanel } from "./photo/PhotoPanel";
 import { RoomScene } from "./RoomScene";
 import { EditorProvider } from "./state/EditorContext";
 import { createEditorStore } from "./state/editorStore";
@@ -64,6 +65,9 @@ function Editor() {
             </div>
             <div className="pointer-events-none absolute inset-x-0 top-16 flex justify-center">
               <NoticeToast />
+            </div>
+            <div className="pointer-events-none absolute right-4 bottom-4">
+              <PhotoPanel />
             </div>
             <div className="pointer-events-none absolute bottom-4 left-4">
               <SelectionCard />

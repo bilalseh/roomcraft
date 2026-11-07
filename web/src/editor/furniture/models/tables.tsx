@@ -12,6 +12,7 @@ export function Table({ width, depth, height, color }: ModelProps) {
         size={[width, TOP, depth]}
         color={color}
         roughness={0.6}
+        surface="wood"
       />
     </group>
   );
@@ -27,6 +28,7 @@ export function Desk({ width, depth, height, color, lit }: ModelProps) {
         at={[width / 2 - drawer / 2 - 0.04, height - TOP - 0.08, 0]}
         size={[drawer, 0.16, depth - 0.08]}
         color={shade(color, 0.92)}
+        surface="wood"
       />
     </group>
   );

@@ -3,6 +3,8 @@ import { Cylinder, type ModelProps } from "../parts";
 const SHADE = 0.3;
 const GLOW = "#ffcf8a";
 const LAMPLIGHT = "#ffd9a6";
+// Lamps light by the inverse square law with no cut-off range (distance 0), which the
+// photo's path tracer needs: a range draws a hard edge where the light stops.
 
 /** A weighted base, a slim pole and a fabric shade that glows at night. */
 export function FloorLamp({ width, height, color, lit }: ModelProps) {
@@ -18,6 +20,7 @@ export function FloorLamp({ width, height, color, lit }: ModelProps) {
         height={SHADE}
         color={color}
         roughness={0.95}
+        surface="fabric"
         {...(lit ? { emissive: GLOW } : {})}
       />
       {lit && (
@@ -25,7 +28,7 @@ export function FloorLamp({ width, height, color, lit }: ModelProps) {
           position={[0, pole + SHADE / 2, 0]}
           color={LAMPLIGHT}
           intensity={3}
-          distance={6}
+          distance={0}
           decay={2}
         />
       )}
@@ -54,7 +57,7 @@ export function Pendant({ width, height, color, lit }: ModelProps) {
           position={[0, -0.05, 0]}
           color={LAMPLIGHT}
           intensity={5}
-          distance={8}
+          distance={0}
           decay={2}
         />
       )}

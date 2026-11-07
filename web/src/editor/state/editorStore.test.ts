@@ -115,4 +115,23 @@ describe("editor store", () => {
     expect(store.getState().selectedId).toBeNull();
     expect(store.getState().history.past).toHaveLength(0);
   });
+
+  it("takes a photo without the selection outline, then keeps only the finished image", () => {
+    const store = storeWith([sofa]);
+    store.getState().select("sofa");
+
+    store.getState().startPhoto();
+    expect(store.getState().selectedId).toBeNull();
+    store.getState().setPhotoProgress(0.5);
+    expect(store.getState().photo).toEqual({ status: "rendering", progress: 0.5 });
+
+    store.getState().finishPhoto("data:image/jpeg;base64,abc");
+    store.getState().setPhotoProgress(0.9);
+    expect(store.getState().photo).toEqual({ status: "done", image: "data:image/jpeg;base64,abc" });
+
+    store.getState().finishPhoto(null);
+    expect(store.getState().photo).toEqual({ status: "failed" });
+    store.getState().closePhoto();
+    expect(store.getState().photo).toBeNull();
+  });
 });

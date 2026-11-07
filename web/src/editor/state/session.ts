@@ -14,6 +14,12 @@ export interface CaptureOptions {
 
 export type Capture = (options?: CaptureOptions) => string | null;
 
+/** A path-traced picture of the view: being rendered, finished, or not possible here. */
+export type Photo =
+  | { status: "rendering"; progress: number }
+  | { status: "done"; image: string }
+  | { status: "failed" };
+
 export interface SaveStatus {
   state: "saved" | "saving" | "error";
   /** When the last save finished, in milliseconds since the epoch. */
@@ -31,6 +37,7 @@ export interface SessionSlice {
   captureThumbnail: Capture | null;
   lighting: Lighting;
   cameraMode: CameraMode;
+  photo: Photo | null;
 
   setReadOnly: (readOnly: boolean) => void;
   setLighting: (lighting: Lighting) => void;
@@ -38,6 +45,11 @@ export interface SessionSlice {
   setShareId: (shareId: string | null) => void;
   setSave: (save: SaveStatus) => void;
   setCaptureThumbnail: (capture: Capture | null) => void;
+  startPhoto: () => void;
+  setPhotoProgress: (progress: number) => void;
+  /** The finished image as a data URL, or null when it could not be made. */
+  finishPhoto: (image: string | null) => void;
+  closePhoto: () => void;
 }
 
 export interface SessionOptions {
@@ -57,6 +69,7 @@ export function sessionSlice(
     captureThumbnail: null,
     lighting: "day",
     cameraMode: "orbit",
+    photo: null,
 
     // Switching to viewing only (a phone) also drops the selection and any drag.
     setReadOnly: (readOnly) => {
@@ -77,6 +90,19 @@ export function sessionSlice(
     },
     setCaptureThumbnail: (captureThumbnail) => {
       set({ captureThumbnail });
+    },
+    // A photo shows the room, not the editor: no selection outline or snapping grid.
+    startPhoto: () => {
+      set({ photo: { status: "rendering", progress: 0 }, selectedId: null, drag: null });
+    },
+    setPhotoProgress: (progress) => {
+      set(({ photo }) => (photo?.status === "rendering" ? { photo: { ...photo, progress } } : {}));
+    },
+    finishPhoto: (image) => {
+      set({ photo: image ? { status: "done", image } : { status: "failed" } });
+    },
+    closePhoto: () => {
+      set({ photo: null });
     },
   });
 }

@@ -3,12 +3,27 @@ import { Block, Cylinder, type ModelProps } from "../parts";
 const RUG = 0.01;
 
 export function Rug({ width, depth, color }: ModelProps) {
-  return <Block at={[0, RUG / 2, 0]} size={[width, RUG, depth]} color={color} roughness={1} />;
+  return (
+    <Block
+      at={[0, RUG / 2, 0]}
+      size={[width, RUG, depth]}
+      color={color}
+      roughness={1}
+      surface="fabric"
+    />
+  );
 }
 
 export function RoundRug({ width, color }: ModelProps) {
   return (
-    <Cylinder at={[0, RUG / 2, 0]} radius={width / 2} height={RUG} color={color} roughness={1} />
+    <Cylinder
+      at={[0, RUG / 2, 0]}
+      radius={width / 2}
+      height={RUG}
+      color={color}
+      roughness={1}
+      surface="fabric"
+    />
   );
 }
 
@@ -43,7 +58,7 @@ export function Plant({ width, height, color }: ModelProps) {
 export function WallArt({ width, depth, height, color }: ModelProps) {
   return (
     <group>
-      <Block at={[0, height / 2, 0]} size={[width, height, depth]} color="#2b2b2b" />
+      <Block at={[0, height / 2, 0]} size={[width, height, depth]} color="#2b2b2b" surface="wood" />
       <Block
         at={[0, height / 2, depth / 2 + 0.002]}
         size={[width - 0.08, height - 0.08, 0.004]}
@@ -57,7 +72,7 @@ export function WallArt({ width, depth, height, color }: ModelProps) {
 export function Mirror({ width, depth, height, color }: ModelProps) {
   return (
     <group>
-      <Block at={[0, height / 2, 0]} size={[width, height, depth]} color={color} />
+      <Block at={[0, height / 2, 0]} size={[width, height, depth]} color={color} surface="wood" />
       <Block
         at={[0, height / 2, depth / 2 + 0.002]}
         size={[width - 0.06, height - 0.06, 0.004]}

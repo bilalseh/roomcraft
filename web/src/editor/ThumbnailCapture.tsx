@@ -8,15 +8,17 @@ const THUMBNAIL: CaptureOptions = { width: 480, height: 300, type: "image/webp",
 
 /**
  * Lets the editor take a picture of the current view, for thumbnails and the PDF.
- * It renders a fresh frame first, so the canvas never needs to keep its buffer.
+ * It renders a fresh frame first, through the scene's effects, so the canvas never
+ * needs to keep its buffer.
  */
 export function ThumbnailCapture() {
-  const { gl, scene, camera } = useThree();
+  const gl = useThree((state) => state.gl);
+  const advance = useThree((state) => state.advance);
   const setCapture = useEditor((state) => state.setCaptureThumbnail);
 
   useEffect(() => {
     setCapture(({ width, height, type, quality } = THUMBNAIL) => {
-      gl.render(scene, camera);
+      advance(performance.now());
       const source = gl.domElement;
       const canvas = document.createElement("canvas");
       canvas.width = width;
@@ -45,7 +47,7 @@ export function ThumbnailCapture() {
     return () => {
       setCapture(null);
     };
-  }, [gl, scene, camera, setCapture]);
+  }, [gl, advance, setCapture]);
 
   return null;
 }

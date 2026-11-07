@@ -16,11 +16,19 @@ export function Sofa({ width, depth, height, color }: ModelProps) {
   return (
     <group>
       <FourLegs width={width} depth={depth} height={FOOT} radius={0.025} color="#3f3a36" />
-      <Block at={[0, (FOOT + SEAT) / 2, 0]} size={[width, SEAT - FOOT, depth]} color={color} />
+      <Block
+        at={[0, (FOOT + SEAT) / 2, 0]}
+        size={[width, SEAT - FOOT, depth]}
+        color={color}
+        surface="fabric"
+        radius={0.03}
+      />
       <Block
         at={[0, (SEAT + height) / 2, -depth / 2 + BACK / 2]}
         size={[width, height - SEAT, BACK]}
         color={color}
+        surface="fabric"
+        radius={0.06}
       />
       {[-1, 1].map((side) => (
         <Block
@@ -28,6 +36,8 @@ export function Sofa({ width, depth, height, color }: ModelProps) {
           at={[side * (width / 2 - ARM / 2), (FOOT + armHeight) / 2, 0]}
           size={[ARM, armHeight - FOOT, depth]}
           color={color}
+          surface="fabric"
+          radius={0.06}
         />
       ))}
       {Array.from({ length: seats }, (_, seat) => (
@@ -37,6 +47,8 @@ export function Sofa({ width, depth, height, color }: ModelProps) {
           size={[cushionWidth - 0.02, 0.12, cushionDepth]}
           color={shade(color, 1.08)}
           roughness={0.95}
+          surface="fabric"
+          radius={0.05}
         />
       ))}
     </group>
@@ -55,11 +67,12 @@ export function Chair({ width, depth, height, color }: ModelProps) {
         radius={0.017}
         color={color}
       />
-      <Block at={[0, seat + 0.02, 0]} size={[width, 0.04, depth]} color={color} />
+      <Block at={[0, seat + 0.02, 0]} size={[width, 0.04, depth]} color={color} surface="wood" />
       <Block
         at={[0, (seat + 0.04 + height) / 2, -depth / 2 + 0.015]}
         size={[width, height - seat - 0.04, 0.03]}
         color={color}
+        surface="wood"
       />
     </group>
   );
@@ -71,11 +84,19 @@ export function OfficeChair({ width, depth, height, color }: ModelProps) {
     <group>
       <Cylinder at={[0, 0.04, 0]} radius={width * 0.45} height={0.05} color="#27272a" />
       <Cylinder at={[0, (0.07 + seat) / 2, 0]} radius={0.03} height={seat - 0.07} color="#71717a" />
-      <Block at={[0, seat, 0]} size={[width * 0.78, 0.08, depth * 0.78]} color={color} />
+      <Block
+        at={[0, seat, 0]}
+        size={[width * 0.78, 0.08, depth * 0.78]}
+        color={color}
+        surface="fabric"
+        radius={0.03}
+      />
       <Block
         at={[0, (seat + height) / 2 + 0.05, -depth * 0.33]}
         size={[width * 0.72, height - seat - 0.1, 0.06]}
         color={color}
+        surface="fabric"
+        radius={0.025}
       />
     </group>
   );
@@ -85,7 +106,13 @@ export function Ottoman({ width, depth, height, color }: ModelProps) {
   return (
     <group>
       <FourLegs width={width} depth={depth} height={0.05} inset={0.05} color="#3f3a36" />
-      <Block at={[0, (0.05 + height) / 2, 0]} size={[width, height - 0.05, depth]} color={color} />
+      <Block
+        at={[0, (0.05 + height) / 2, 0]}
+        size={[width, height - 0.05, depth]}
+        color={color}
+        surface="fabric"
+        radius={0.06}
+      />
     </group>
   );
 }

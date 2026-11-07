@@ -13,6 +13,8 @@ export function ViewControls() {
   const setMode = useEditor((state) => state.setCameraMode);
   const night = useEditor((state) => state.lighting === "night");
   const setLighting = useEditor((state) => state.setLighting);
+  const photographing = useEditor((state) => state.photo !== null);
+  const startPhoto = useEditor((state) => state.startPhoto);
 
   return (
     <div className="pointer-events-auto flex items-center gap-2">
@@ -45,6 +47,15 @@ export function ViewControls() {
         className="rounded-lg border border-stone-300 bg-white/95 px-3 py-1.5 text-sm text-stone-700 shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-teal-700 aria-pressed:border-indigo-900 aria-pressed:bg-indigo-950 aria-pressed:text-white"
       >
         Night
+      </button>
+      <button
+        type="button"
+        onClick={startPhoto}
+        disabled={mode === "plan" || photographing}
+        title="A realistic picture of this view, to download"
+        className="rounded-lg border border-stone-300 bg-white/95 px-3 py-1.5 text-sm text-stone-700 shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-teal-700 disabled:opacity-50"
+      >
+        Photo
       </button>
     </div>
   );

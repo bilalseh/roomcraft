@@ -19,18 +19,23 @@ export function Bed({ width, depth, height, color }: ModelProps) {
         at={[0, (0.08 + FRAME_TOP) / 2, 0]}
         size={[width, FRAME_TOP - 0.08, depth]}
         color={wood}
+        surface="wood"
       />
       <Block
         at={[0, FRAME_TOP + MATTRESS / 2, HEADBOARD / 2]}
         size={[width - 0.06, MATTRESS, depth - HEADBOARD - 0.04]}
         color="#f5f3ef"
         roughness={0.95}
+        surface="fabric"
+        radius={0.05}
       />
       <Block
         at={[0, mattressTop + 0.03, depth / 2 - depth * 0.33]}
         size={[width - 0.02, 0.06, depth * 0.64]}
         color={color}
         roughness={0.95}
+        surface="fabric"
+        radius={0.025}
       />
       {Array.from({ length: pillows }, (_, index) => (
         <Block
@@ -43,12 +48,16 @@ export function Bed({ width, depth, height, color }: ModelProps) {
           size={[pillowWidth, 0.12, 0.34]}
           color="#ffffff"
           roughness={0.95}
+          surface="fabric"
+          radius={0.055}
         />
       ))}
       <Block
         at={[0, height / 2, -depth / 2 + HEADBOARD / 2]}
         size={[width, height, HEADBOARD]}
         color={wood}
+        surface="wood"
+        radius={0.02}
       />
     </group>
   );
