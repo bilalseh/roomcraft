@@ -52,7 +52,10 @@ export function useAutosave(store: EditorStore) {
     };
 
     const unsubscribe = store.subscribe((state, previous) => {
-      if (state.history.present !== previous.history.present) schedule(SAVE_DELAY_MS);
+      if (state.history.present === previous.history.present) return;
+      // A change waiting to be written is not saved yet, so the indicator must not say it is.
+      if (state.save.state === "saved") state.setSave({ ...state.save, state: "saving" });
+      schedule(SAVE_DELAY_MS);
     });
     const firstThumbnail = setTimeout(refreshThumbnail, FIRST_THUMBNAIL_MS);
 
