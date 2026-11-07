@@ -57,7 +57,8 @@ Playwright happy path (`e2e/`, `pnpm test:e2e`, Auth + Firestore emulators, web
 built with `--mode e2e`). The e2e test runs fully only in CI (Firestore emulator
 needs Java 21); locally the wizard half passes against the Auth emulator alone.
 Docker Desktop is installed but has no WSL distro, so it does not start.
-Realism pass (2026-11-07, asked for after phase 9): rounded procedural pieces,
+Realism pass (2026-11-07, asked for after phase 9; live and verified on the site,
+photos in 10 to 16 s): rounded procedural pieces,
 CC0 Poly Haven textures (grey colour maps tinted by the piece colour, UVs in
 metres), skirting and opening frames (`domain/trim.ts`), a scanned CC0 plant,
 RoomEnvironment lighting, PCSS shadows, and N8AO, bloom, Khronos Neutral tone
