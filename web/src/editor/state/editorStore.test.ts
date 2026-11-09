@@ -116,6 +116,19 @@ describe("editor store", () => {
     expect(store.getState().history.past).toHaveLength(0);
   });
 
+  it("walks from each corner in turn, and from the door again when Walk is chosen", () => {
+    const store = storeWith([sofa]);
+    store.getState().select("sofa");
+
+    store.getState().nextCorner();
+    expect(store.getState()).toMatchObject({ cameraMode: "walk", corner: 0, selectedId: null });
+    for (let turn = 0; turn < 4; turn++) store.getState().nextCorner();
+    expect(store.getState().corner).toBe(0);
+
+    store.getState().setCameraMode("walk");
+    expect(store.getState().corner).toBeNull();
+  });
+
   it("takes a photo without the selection outline, then keeps only the finished image", () => {
     const store = storeWith([sofa]);
     store.getState().select("sofa");

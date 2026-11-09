@@ -137,20 +137,33 @@ function Books({
   );
 }
 
+/** Height of the media unit's cabinet, legs included; the television stands on it. */
+export const MEDIA_CABINET = 0.51;
+const MEDIA_LEGS = 0.06;
+
 /** A low media unit with a television standing on it. */
-export function MediaUnit({ width, depth, height, color }: ModelProps) {
-  const unit = 0.45;
-  const screen = Math.min(height - unit - 0.12, width * 0.48);
+export function MediaUnit(props: ModelProps) {
+  const { width, depth, color } = props;
   return (
     <group>
-      <FourLegs width={width} depth={depth} height={0.06} inset={0.05} color="#27272a" />
+      <FourLegs width={width} depth={depth} height={MEDIA_LEGS} inset={0.05} color="#27272a" />
       <Block
-        at={[0, 0.06 + unit / 2, 0]}
-        size={[width, unit, depth]}
+        at={[0, (MEDIA_LEGS + MEDIA_CABINET) / 2, 0]}
+        size={[width, MEDIA_CABINET - MEDIA_LEGS, depth]}
         color={color}
         surface="wood"
       />
-      <Block at={[0, 0.06 + unit + 0.03, 0]} size={[0.25, 0.06, 0.18]} color="#18181b" />
+      <Television {...props} />
+    </group>
+  );
+}
+
+/** The television on its stand, on top of the media unit's cabinet. */
+export function Television({ width, height }: ModelProps) {
+  const screen = Math.min(height - MEDIA_CABINET - 0.12, width * 0.48);
+  return (
+    <group>
+      <Block at={[0, MEDIA_CABINET + 0.03, 0]} size={[0.25, 0.06, 0.18]} color="#18181b" />
       <Block
         at={[0, height - screen / 2, 0]}
         size={[width * 0.86, screen, 0.04]}

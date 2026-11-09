@@ -20,6 +20,7 @@ import {
 
 const DOOR_OPEN_ANGLE = (75 * Math.PI) / 180;
 const DOOR_THICKNESS = 0.04;
+const WINDOW = { day: "#e9f1f8", night: "#0d1524" };
 
 const FLOORS: Record<FloorMaterial, { surface: SurfaceName; roughness: number }> = {
   wood: { surface: "wood-floor", roughness: 0.9 },
@@ -70,9 +71,19 @@ export function RoomShell({ room, materials, night, ceiling }: RoomShellProps) {
         />
       </mesh>
       {ceiling && (
-        <mesh rotation-x={Math.PI / 2} position={[room.width / 2, room.height, room.depth / 2]}>
+        <mesh
+          rotation-x={Math.PI / 2}
+          position={[room.width / 2, room.height, room.depth / 2]}
+          castShadow
+        >
           <planeGeometry args={[room.width, room.depth]} />
-          <meshStandardMaterial color="#f7f6f3" roughness={1} />
+          {/* Light bounced off the floor, which the scene's lights alone would not give it. */}
+          <meshStandardMaterial
+            color="#f7f6f3"
+            roughness={1}
+            emissive="#f7f6f3"
+            emissiveIntensity={night ? 0.02 : 0.22}
+          />
         </mesh>
       )}
 
@@ -101,11 +112,12 @@ export function RoomShell({ room, materials, night, ceiling }: RoomShellProps) {
             .filter((pane) => pane.wall === wall)
             .map((pane) => (
               <BoxMesh key={pane.center.join()} box={pane}>
-                <meshPhysicalMaterial
-                  color={night ? "#1c2638" : "#dbeafe"}
-                  transparent
-                  opacity={night ? 0.85 : 0.25}
-                  roughness={0.05}
+                {/* Bright sky by day, a dark glossy pane at night; the photo lights the room from it. */}
+                <meshStandardMaterial
+                  color="#000000"
+                  emissive={night ? WINDOW.night : WINDOW.day}
+                  emissiveIntensity={night ? 1 : 1.15}
+                  roughness={0.06}
                 />
               </BoxMesh>
             ))}

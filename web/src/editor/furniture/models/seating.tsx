@@ -1,12 +1,16 @@
-import { shade } from "../color";
+import { accent, OATMEAL, shade } from "../color";
 import { Block, Cylinder, FourLegs, type ModelProps } from "../parts";
+import { Cushion, FoldedThrow } from "./textiles";
 
 const FOOT = 0.08;
 const SEAT = 0.42;
 const ARM = 0.16;
 const BACK = 0.18;
 
-/** Sofas and armchairs: a base, back, arms and one cushion per seat. */
+/**
+ * Sofas and armchairs: a base, back, arms and one cushion per seat; sofas also
+ * get two scatter cushions and a folded throw.
+ */
 export function Sofa({ width, depth, height, color }: ModelProps) {
   const seats = width > 1.8 ? 3 : width > 1.2 ? 2 : 1;
   const cushionWidth = (width - 2 * ARM) / seats;
@@ -51,6 +55,24 @@ export function Sofa({ width, depth, height, color }: ModelProps) {
           radius={0.05}
         />
       ))}
+      {seats > 1 && <SofaTextiles width={width} depth={depth} color={color} />}
+    </group>
+  );
+}
+
+function SofaTextiles({ width, depth, color }: { width: number; depth: number; color: string }) {
+  const size: [number, number, number] = [0.42, 0.42, 0.13];
+  const x = width / 2 - ARM - 0.26;
+  const at = (side: number): [number, number, number] => [
+    side * x,
+    SEAT + 0.12 + 0.19,
+    -depth / 2 + BACK + 0.1,
+  ];
+  return (
+    <group>
+      <Cushion at={at(-1)} size={size} color={accent(color)} tilt={0.06} />
+      <Cushion at={at(1)} size={size} color={OATMEAL} tilt={-0.08} />
+      <FoldedThrow at={[x - 0.05, SEAT + 0.12, 0.08]} turn={0.18} color={OATMEAL} />
     </group>
   );
 }

@@ -37,11 +37,15 @@ export interface SessionSlice {
   captureThumbnail: Capture | null;
   lighting: Lighting;
   cameraMode: CameraMode;
+  /** Walking from a corner (0 to 3, see cornerViewpoints), or from the door when null. */
+  corner: number | null;
   photo: Photo | null;
 
   setReadOnly: (readOnly: boolean) => void;
   setLighting: (lighting: Lighting) => void;
   setCameraMode: (mode: CameraMode) => void;
+  /** Walk mode from the next corner, at eye height and facing the room. */
+  nextCorner: () => void;
   setShareId: (shareId: string | null) => void;
   setSave: (save: SaveStatus) => void;
   setCaptureThumbnail: (capture: Capture | null) => void;
@@ -69,6 +73,7 @@ export function sessionSlice(
     captureThumbnail: null,
     lighting: "day",
     cameraMode: "orbit",
+    corner: null,
     photo: null,
 
     // Switching to viewing only (a phone) also drops the selection and any drag.
@@ -80,7 +85,19 @@ export function sessionSlice(
     },
     // Walking around is for looking, not editing, so it clears the selection.
     setCameraMode: (cameraMode) => {
-      set(cameraMode === "walk" ? { cameraMode, selectedId: null, drag: null } : { cameraMode });
+      set(
+        cameraMode === "walk"
+          ? { cameraMode, corner: null, selectedId: null, drag: null }
+          : { cameraMode, corner: null },
+      );
+    },
+    nextCorner: () => {
+      set(({ corner }) => ({
+        cameraMode: "walk",
+        corner: ((corner ?? -1) + 1) % 4,
+        selectedId: null,
+        drag: null,
+      }));
     },
     setShareId: (shareId) => {
       set({ shareId });

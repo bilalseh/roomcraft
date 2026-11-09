@@ -5,7 +5,7 @@ import { memo, useMemo, useRef, type ReactNode } from "react";
 import { Plane, Vector3, type Group } from "three";
 import { isWallCutAway, wallFacing } from "../cutaway";
 import { useEditor, useEditorStore } from "../state/useEditor";
-import { MODELS } from "./models";
+import { ItemModel } from "./ItemModel";
 
 const FLOOR = new Plane(new Vector3(0, 1, 0), 0);
 const SELECTED = "#0f766e";
@@ -49,7 +49,6 @@ export const FurnitureItem = memo(function FurnitureItem({
 
   const shown = drag ?? placement;
   const y = item.layer === "ceiling" ? room.height - item.height : (item.elevation ?? 0);
-  const Model = MODELS[item.model];
 
   // Pointer position on the floor, in room coordinates (the room group is centred on the origin).
   const floorPoint = (event: ThreeEvent<PointerEvent>) => {
@@ -92,13 +91,7 @@ export const FurnitureItem = memo(function FurnitureItem({
       onPointerUp={onPointerUp}
     >
       <HiddenWithWall room={room} rotation={item.layer === "wall" ? shown.rotation : null}>
-        <Model
-          width={item.width}
-          depth={item.depth}
-          height={item.height}
-          color={placement.color ?? item.color}
-          lit={lit}
-        />
+        <ItemModel item={item} color={placement.color ?? item.color} lit={lit} />
       </HiddenWithWall>
       {(selected || drag) && (
         <SelectionBox item={item} color={drag?.problem ? INVALID : SELECTED} />

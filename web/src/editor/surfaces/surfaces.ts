@@ -1,5 +1,12 @@
 import { useEffect, useSyncExternalStore } from "react";
-import { RepeatWrapping, SRGBColorSpace, TextureLoader, Vector2, type Texture } from "three";
+import {
+  RepeatWrapping,
+  SRGBColorSpace,
+  TextureLoader,
+  Vector2,
+  type Color,
+  type Texture,
+} from "three";
 import carpetNormal from "./textures/carpet/normal.jpg";
 import carpetRoughness from "./textures/carpet/roughness.jpg";
 import fabricNormal from "./textures/fabric/normal.jpg";
@@ -24,6 +31,16 @@ export type SurfaceName = "wood" | "fabric" | "plaster" | "wood-floor" | "tile-f
  * the average they were given.
  */
 export const COLOR_MAP_MEAN = 0.51;
+
+/**
+ * The material colour that tints a grey colour map to `color` on average: brightened
+ * by the map's average, but never past white, or a light piece would lose its grain
+ * to the tone mapping.
+ */
+export function colorMapTint(color: Color): Color {
+  const brightest = Math.max(color.r, color.g, color.b, 0.001);
+  return color.clone().multiplyScalar(Math.min(1 / COLOR_MAP_MEAN, 1 / brightest));
+}
 
 interface SurfaceSource {
   /** Grey, so the material's colour tints it; surfaces without one keep the colour flat. */

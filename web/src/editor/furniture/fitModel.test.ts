@@ -1,6 +1,6 @@
 import { Box3, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
-import { fitToBox, tintToward } from "./fitModel";
+import { fitToBox, stretchToBox, tintToward } from "./fitModel";
 
 describe("fitToBox", () => {
   it("scales by the tightest dimension and stands the model centred on the floor", () => {
@@ -19,6 +19,19 @@ describe("fitToBox", () => {
     const bounds = new Box3(new Vector3(-0.1, 0, -0.1), new Vector3(0.1, 2, 0.1));
 
     expect(fitToBox(bounds, 1, 1, 1).scale).toBeCloseTo(0.5);
+  });
+});
+
+describe("stretchToBox", () => {
+  it("scales each axis to the catalog size and stands the model centred on the floor", () => {
+    const bounds = new Box3(new Vector3(-0.5, 0.2, -0.25), new Vector3(0.5, 1.2, 0.35));
+
+    const { scale, offset } = stretchToBox(bounds, 1.2, 0.5, 0.6);
+
+    expect(scale.toArray()).toEqual([1.2, 0.5, 1]);
+    expect(offset.x).toBeCloseTo(0);
+    expect(offset.y).toBeCloseTo(-0.1);
+    expect(offset.z).toBeCloseTo(-0.05);
   });
 });
 

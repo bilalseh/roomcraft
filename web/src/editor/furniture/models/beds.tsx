@@ -1,11 +1,15 @@
-import { shade } from "../color";
+import { accent, shade } from "../color";
 import { Block, FourLegs, type ModelProps } from "../parts";
+import { BedThrow, Cushion } from "./textiles";
 
 const FRAME_TOP = 0.32;
 const MATTRESS = 0.2;
 const HEADBOARD = 0.08;
 
-/** A bed frame, mattress, pillows and a duvet in the item's colour, against a headboard. */
+/**
+ * A bed frame, mattress, pillows and a duvet in the item's colour, against a
+ * headboard, with a cushion in front of the pillows and a throw across the foot.
+ */
 export function Bed({ width, depth, height, color }: ModelProps) {
   const pillows = width > 1.2 ? 2 : 1;
   const pillowWidth = (width - 0.2) / pillows - 0.06;
@@ -52,6 +56,13 @@ export function Bed({ width, depth, height, color }: ModelProps) {
           radius={0.055}
         />
       ))}
+      <Cushion
+        at={[0, mattressTop + 0.06 + 0.2, -depth / 2 + 0.55]}
+        size={[Math.min(0.5, width * 0.4), 0.36, 0.12]}
+        color={accent(color)}
+        lean={0.3}
+      />
+      <BedThrow width={width} z={depth / 2 - 0.35} top={mattressTop + 0.06} color={accent(color)} />
       <Block
         at={[0, height / 2, -depth / 2 + HEADBOARD / 2]}
         size={[width, height, HEADBOARD]}

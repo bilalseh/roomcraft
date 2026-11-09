@@ -1,6 +1,9 @@
 import { Grid } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { useMemo } from "react";
 import { PHONE, useMediaQuery } from "../components/useMediaQuery";
+import { sunDirection } from "../domain/sun";
+import { Curtains } from "./Curtains";
 import { FurnitureLayer } from "./furniture/FurnitureLayer";
 import { PhotoRenderer } from "./photo/PhotoRenderer";
 import { PlanMeasurements } from "./PlanMeasurements";
@@ -26,6 +29,7 @@ export function RoomScene() {
   const phone = useMediaQuery(PHONE);
   const photographing = useEditor((state) => state.photo?.status === "rendering");
   const span = Math.max(room.width, room.depth);
+  const sun = useMemo(() => sunDirection(room), [room]);
 
   return (
     <Canvas
@@ -39,7 +43,13 @@ export function RoomScene() {
       }}
     >
       <color attach="background" args={[night ? BACKGROUND.night : BACKGROUND.day]} />
-      <SceneLighting span={span} night={night} sunShadows={!night && mode !== "plan"} />
+      <SceneLighting
+        span={span}
+        sun={sun}
+        night={night}
+        sunShadows={!night && mode !== "plan"}
+        indoors={mode === "walk"}
+      />
       {photographing ? (
         <PhotoRenderer />
       ) : (
@@ -54,6 +64,7 @@ export function RoomScene() {
       {/* Room coordinates: origin at the north-west corner, centred on the world origin. */}
       <group position={[-room.width / 2, 0, -room.depth / 2]}>
         <RoomShell room={room} materials={materials} night={night} ceiling={mode === "walk"} />
+        {mode !== "plan" && <Curtains />}
         {placing && mode !== "walk" && (
           <Grid
             args={[room.width, room.depth]}

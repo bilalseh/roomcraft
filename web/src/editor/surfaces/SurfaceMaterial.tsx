@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { Color } from "three";
-import { COLOR_MAP_MEAN, useSurface, type SurfaceName } from "./surfaces";
+import { Color, type Side } from "three";
+import { colorMapTint, useSurface, type SurfaceName } from "./surfaces";
 
 interface SurfaceMaterialProps {
   surface?: SurfaceName | undefined;
@@ -9,39 +9,40 @@ interface SurfaceMaterialProps {
   metalness?: number;
   emissive?: string;
   emissiveIntensity?: number;
+  side?: Side;
 }
 
 /** Linear luminance above which a wood finish reads as paint rather than stain. */
 const PALE = 0.5;
+/** Fabric catches a soft rim of light at grazing angles; wood has a thin satin lacquer. */
+const FABRIC_SHEEN = { sheen: 0.5, sheenRoughness: 0.75 };
+const LACQUER = { clearcoat: 0.12, clearcoatRoughness: 0.4 };
 
 /**
- * A standard material, textured once its surface has loaded. The texture's
+ * A physical material, textured once its surface has loaded. The texture's
  * roughness is scaled by `roughness`, and its grey colour map tinted by `color`.
  */
 export function SurfaceMaterial(props: SurfaceMaterialProps) {
-  const { surface, color, roughness = 0.8, metalness = 0, ...glow } = props;
+  const { surface, color, roughness = 0.8, metalness = 0, ...rest } = props;
   const maps = useSurface(surface);
   const base = useMemo(() => new Color(color), [color]);
   // Pale wood is painted: it keeps the grain's relief but not its colour.
   const painted = surface === "wood" && 0.2126 * base.r + 0.7152 * base.g + 0.0722 * base.b > PALE;
   const colorMap = painted ? null : (maps?.map ?? null);
-
-  const tint = useMemo(() => {
-    if (!colorMap) return base;
-    // Brightened by the colour map's average, so the piece keeps the colour chosen, but never
-    // past white: a light floor would lose its grain to the tone mapping.
-    const brightest = Math.max(base.r, base.g, base.b, 0.001);
-    return base.clone().multiplyScalar(Math.min(1 / COLOR_MAP_MEAN, 1 / brightest));
-  }, [base, colorMap]);
+  const tint = useMemo(() => (colorMap ? colorMapTint(base) : base), [base, colorMap]);
+  const sheenColor = useMemo(() => base.clone().lerp(new Color("#ffffff"), 0.35), [base]);
+  const finish =
+    surface === "fabric" ? { ...FABRIC_SHEEN, sheenColor } : surface === "wood" ? LACQUER : {};
 
   // A new material when the textures arrive: three compiles a different shader for them.
   return (
-    <meshStandardMaterial
+    <meshPhysicalMaterial
       key={maps ? "textured" : "plain"}
       color={tint}
       roughness={roughness}
       metalness={metalness}
-      {...glow}
+      {...finish}
+      {...rest}
       {...(maps ? { ...maps, map: colorMap } : {})}
     />
   );

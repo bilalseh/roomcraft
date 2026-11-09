@@ -6,10 +6,14 @@ import {
   PointerLockControls,
 } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { REDUCED_MOTION, useMediaQuery } from "../components/useMediaQuery";
 import { Vector3 } from "three";
+import { catalogItem } from "../domain/catalog";
+import { footprint } from "../domain/placement";
+import { cornerViewpoints, type Viewpoint } from "../domain/viewpoints";
 import { pointOnWall, wallFrame } from "../domain/walls";
+import { useEditor } from "./state/useEditor";
 
 /** The element that captures the mouse when walk mode is clicked. */
 export const WALK_SURFACE_ID = "editor-canvas";
@@ -72,12 +76,24 @@ const KEYS: Record<string, [forward: number, right: number]> = {
   ArrowLeft: [0, -1],
 };
 
-/** First person at eye height, starting inside the first door and looking into the room. */
+/**
+ * First person at eye height, starting inside the first door and looking into the
+ * room, or from a corner (see nextCorner).
+ */
 export function WalkView({ room }: { room: Room }) {
   const pressed = useRef(new Set<string>());
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
-  const start = walkStart(room);
+  const corner = useEditor((state) => state.corner);
+  const furniture = useEditor((state) => state.history.present.furniture);
+  const start = useMemo(() => {
+    if (corner === null) return walkStart(room);
+    const pieces = furniture.flatMap((placement) => {
+      const item = catalogItem(placement.itemId);
+      return item ? [{ ...footprint(placement, item), height: item.height }] : [];
+    });
+    return cornerViewpoints(room, pieces)[corner] ?? walkStart(room);
+  }, [corner, furniture, room]);
 
   useEffect(() => {
     const keys = pressed.current;
@@ -133,7 +149,7 @@ export function WalkView({ room }: { room: Room }) {
 }
 
 /** Just inside the first door, facing into the room; the middle of the room without a door. */
-function walkStart(room: Room): { x: number; z: number; yaw: number } {
+function walkStart(room: Room): Viewpoint {
   const door = room.openings.find((opening) => opening.kind === "door");
   if (!door) return { x: room.width / 2, z: room.depth / 2, yaw: 0 };
   const frame = wallFrame(room, door.wall);

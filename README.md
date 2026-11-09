@@ -16,17 +16,18 @@ furnished room) · **API docs:** https://roomcraft-api-929h.onrender.com/docs
 
 - **Room wizard.** Room type, size (metric or imperial), doors and windows on any wall, style
   and budget, validated step by step with the same rules the API uses.
-- **3D editor.** 26 pieces at real sizes, modelled in code with rounded edges and soft
-  cushions, plus a scanned potted plant. Drag with snapping to a 10 cm grid and to walls, rotate
+- **3D editor.** 26 pieces at real sizes: ten are real 3D models, the rest are built in code
+  with rounded edges, soft cushions and throws. Vases, books and small plants dress the
+  furniture, and curtains hang at the windows wherever furniture leaves room. Drag with snapping to a 10 cm grid and to walls, rotate
   in 15° steps, nudge with the arrow keys, undo and redo everything. Pieces cannot overlap or
   leave the room; rugs sit under furniture and art hangs on walls.
 - **Finishes and light.** Wood, tile and carpet floors, plaster walls, and fabric and wood grain
   on the furniture, in any colour; skirting and window frames. Soft sun shadows, contact
   shadows where pieces meet the floor, and day and night with lamps as real light sources.
-- **Photos.** One click path traces the current view in the browser, on the GPU, in about ten
+- **Photos.** One click path traces the current view in the browser, on the GPU, in 10 to 30
   seconds on a laptop, and the picture can be downloaded.
-- **Three ways to look.** Orbit with a dollhouse cut-away, a measured top-down plan, and a
-  first-person walk-through.
+- **Ways to look.** Orbit with a dollhouse cut-away, a measured top-down plan, a first-person
+  walk-through, and corner views at eye height, the way rooms are photographed.
 - **Layout warnings.** Door swings that hit furniture and walkways narrower than 80 cm.
 - **Layout assistant.** One suggestion or three options side by side with thumbnails, previewed
   in the scene and applied as a single undoable step. Refused changes are listed with the
@@ -113,18 +114,21 @@ with a lighter one.
   [ADR-0002](docs/adr/0002-shared-schema.md) for the schema pipeline that does the same for types.
 - **Pydantic as the single source of the contracts.** `pnpm schema` exports JSON Schema and
   generates TypeScript types; CI fails if either is stale.
-- **Procedural furniture, real materials.** Pieces are built from rounded boxes and cylinders in
-  code, with instanced legs, so the style stays consistent and recolouring is free. The realism
-  comes from light and surfaces: an environment map generated in code (no HDR to download),
-  soft shadows, ambient occlusion, and CC0 photo textures in grey, tinted to the chosen colour
-  and laid out in metres so they tile at real size. Only the plant is a scanned model (512 KB),
-  because foliage is where boxes look least real. The effects add about 180 KB gzipped to the
-  editor.
+- **Real models where they fit, shapes in code elsewhere.** Ten pieces and the decor are CC0
+  models from Poly Haven; it has no modern sofas, beds or wardrobes, so those are built from
+  rounded boxes and cylinders in code. A script turns each model's main colour texture grey, so
+  any piece takes any colour, then simplifies and compresses it (3.2 MB for all of them; a room
+  loads only its own). The live site serves the models from jsDelivr, pinned to a commit, to
+  keep them off Firebase Hosting's daily download allowance; while one loads, or if it cannot,
+  the piece shows its simple shapes. Light and surfaces do the rest: an environment map
+  generated in code, soft shadows, ambient occlusion, sunlight through the largest window, and
+  CC0 photo textures laid out in metres so they tile at real size.
 - **Photos by path tracing.** The Photo button traces the current view with
   [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer), which loads only
   then (56 KB gzipped). The tracer needs plain geometry, so during a photo the instanced legs
-  become separate meshes, the plant's compressed vertices are floats, and a gradient sky stands
-  in for the editor's environment map. Its WebGL class is deprecated upstream in favour of
+  become separate meshes, the models' compressed vertices are floats, and a gradient sky stands
+  in for the editor's environment map. It copies every texture into one array, at 512 px: at
+  its default of 1024 a furnished room was several times slower. Its WebGL class is deprecated upstream in favour of
   WebGPU, so the version is pinned until the editor moves to WebGPU.
 - **Snapshot history over pure functions.** Layout changes are pure functions returning new
   layouts, and undo keeps the snapshots. Simpler than a command log, and an assistant
@@ -182,7 +186,7 @@ secret.
 
 ## License
 
-Code: [MIT](LICENSE). The textures and the plant model are CC0 from
+Code: [MIT](LICENSE). The textures and the models are CC0 from
 [Poly Haven](https://polyhaven.com); see the credits next to the
 [textures](web/src/editor/surfaces/textures/README.md) and the
-[model](web/src/editor/furniture/models/assets/README.md).
+[models](web/public/models/README.md).

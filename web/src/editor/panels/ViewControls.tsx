@@ -7,7 +7,7 @@ const MODES: { value: CameraMode; label: string }[] = [
   { value: "walk", label: "Walk" },
 ];
 
-/** Camera mode and day or night lighting, floating over the scene. */
+/** Camera mode, corner views, day or night lighting and photos, floating over the scene. */
 export function ViewControls() {
   const mode = useEditor((state) => state.cameraMode);
   const setMode = useEditor((state) => state.setCameraMode);
@@ -15,6 +15,7 @@ export function ViewControls() {
   const setLighting = useEditor((state) => state.setLighting);
   const photographing = useEditor((state) => state.photo !== null);
   const startPhoto = useEditor((state) => state.startPhoto);
+  const nextCorner = useEditor((state) => state.nextCorner);
 
   return (
     <div className="pointer-events-auto flex items-center gap-2">
@@ -47,6 +48,15 @@ export function ViewControls() {
         className="rounded-lg border border-stone-300 bg-white/95 px-3 py-1.5 text-sm text-stone-700 shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-teal-700 aria-pressed:border-indigo-900 aria-pressed:bg-indigo-950 aria-pressed:text-white"
       >
         Night
+      </button>
+      <button
+        type="button"
+        onClick={nextCorner}
+        disabled={photographing}
+        title="Stand in the next corner at eye height, facing the room"
+        className="rounded-lg border border-stone-300 bg-white/95 px-3 py-1.5 text-sm text-stone-700 shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-teal-700 disabled:opacity-50"
+      >
+        Corner view
       </button>
       <button
         type="button"

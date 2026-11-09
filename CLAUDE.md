@@ -70,6 +70,18 @@ meshes, cannot read a PMREM map and shows point light ranges as hard edges, so a
 photo uses separate leg meshes, float geometry, a gradient sky, no outlines, and
 lamps without a range. Thumbnails render through the effects with `advance()`.
 Headless Edge uses the laptop's RTX GPU unless SwiftShader is forced.
+Models and dressing (2026-11-09, options 4 and 1 of the realism list): ten catalog
+pieces are Poly Haven CC0 models (`furniture/scans.ts`), rebuilt by
+`scripts/prepare-models.mjs` (grey colour maps for tinting, meshopt, WebP) into
+`web/public/models`; the live site loads them from jsDelivr pinned to `MODELS_COMMIT`
+and `firebase.json` skips them. Decor on furniture (`furniture/dressing.ts`), cushions
+and throws on the code-built sofas and beds, curtains (`domain/curtains.ts`, left out
+where furniture stands), glowing window panes, sun through the largest window
+(`domain/sun.ts`), a shadow-casting ceiling with extra fill in walk mode, and corner
+views (`domain/viewpoints.ts`). Gotchas: the tracer's texture array must be 512 px (at
+1024, sixty textures made a photo take 97 s); Poly Haven's picture glass shares opaque
+textures, so the script drops it; `Dressing.tsx` beside `dressing.ts` breaks imports on
+Windows, whose file names ignore case.
 
 ### Phase 1 plan (agreed)
 

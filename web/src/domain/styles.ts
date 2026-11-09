@@ -14,3 +14,11 @@ export const STYLE_PALETTES: Record<Style, Palette> = {
   industrial: { wall: "#bdb7ae", floor: "#6f5240", trim: "#3a3633", accent: "#b2532f" },
   classic: { wall: "#efe5d3", floor: "#8b5d3d", trim: "#f8f3ea", accent: "#7a2e3a" },
 };
+
+/** Curtain fabric for each style: light and plain, so it frames the window without competing. */
+export const CURTAIN_COLORS: Record<Style, string> = {
+  modern: "#d9d4cc",
+  scandinavian: "#eee8dd",
+  industrial: "#9a9187",
+  classic: "#c8b49a",
+};

@@ -51,6 +51,9 @@ export function PhotoRenderer() {
         pathTracer.renderDelay = 0;
         pathTracer.fadeDuration = 0;
         pathTracer.rasterizeScene = false;
+        // Every texture is copied into one array at this size, read on every bounce: at the
+        // default 1024 a furnished room's sixty textures made each sample several times slower.
+        pathTracer.textureSize.set(512, 512);
         pathTracer.setScene(scene, camera);
         tracer.current = pathTracer;
       })
