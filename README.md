@@ -43,7 +43,7 @@ furnished room) · **API docs:** https://roomcraft-api-929h.onrender.com/docs
 | --------------------------------------------------------------------------------- | -------------------------------------------------- |
 | ![The editor with the catalog and a furnished living room](docs/media/editor.png) | ![The measured top-down plan](docs/media/plan.png) |
 
-![A path-traced photo of the living room, taken with the Photo button](docs/media/photo.jpg)
+![A path-traced photo of the living room from a corner at eye height, taken with the Photo button](docs/media/photo.jpg)
 
 ## Architecture
 
